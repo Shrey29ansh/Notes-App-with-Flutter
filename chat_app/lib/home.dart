@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:chat_app/database_helper.dart';
 import 'package:flutter/services.dart';
-import 'package:local_auth/local_auth.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -8,59 +9,39 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final LocalAuthentication _localAuthentication = LocalAuthentication();
-  Future<bool> _isBiometricAvailable() async {
-    bool isAvailable = false;
-    try {
-      isAvailable = await _localAuthentication.canCheckBiometrics;
-    } on PlatformException catch (e) {
-      print(e);
-    }
+  final dbHelper = mainDB.instance;
 
-    if (!mounted) return isAvailable;
-
-    isAvailable
-        ? print('Biometric is available!')
-        : print('Biometric is unavailable.');
-
-    return isAvailable;
+  final number = TextEditingController();
+  void _insert(String passcode) async {
+    // row to insert
+    Map<String, dynamic> row = {
+      mainDB.columnName: '$passcode',
+    };
+    final id = await dbHelper.insert(row);
+    print('inserted row id: $id');
   }
 
-  Future<void> _authenticateUser() async {
-    bool isAuthenticated = false;
-    try {
-      isAuthenticated = await _localAuthentication.authenticateWithBiometrics(
-        localizedReason:
-            "Please authenticate to view your transaction overview",
-        useErrorDialogs: true,
-        stickyAuth: true,
-      );
-    } on PlatformException catch (e) {
-      print(e);
-    }
-
-    if (!mounted) return;
-
-    isAuthenticated
-        ? print('User is authenticated!')
-        : print('User is not authenticated.');
-
-    if (isAuthenticated) {
-      print("yes");
-    }
+  Future _query() async {
+    final allRows = await dbHelper.queryAllRows();
+    return allRows;
   }
 
-  Future<void> _getListOfBiometricTypes() async {
-    List<BiometricType> listOfBiometrics;
-    try {
-      listOfBiometrics = await _localAuthentication.getAvailableBiometrics();
-    } on PlatformException catch (e) {
-      print(e);
-    }
-
-    if (!mounted) return;
-
-    print(listOfBiometrics);
+/*
+  void _update() async {
+    // row to update
+    Map<String, dynamic> row = {
+      DatabaseHelper.columnId: 1,
+      DatabaseHelper.columnName: 'Mary',
+    };
+    final rowsAffected = await dbHelper.update(row);
+    print('updated $rowsAffected row(s)');
+  }
+*/
+  void _delete() async {
+    // Assuming that the number of rows is the id for the last row.
+    final id = await dbHelper.queryRowCount();
+    final rowsDeleted = await dbHelper.delete(id);
+    print('deleted $rowsDeleted row(s): row $id');
   }
 
   @override
@@ -71,29 +52,172 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Container(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            color: Colors.white,
-            child: RaisedButton(
-              onPressed: () async {
-                if (await _isBiometricAvailable()) {
-                  await _getListOfBiometricTypes();
-                  await _authenticateUser();
-                }
-              },
-              
-              color: Colors.deepPurple,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
+      appBar: AppBar(
+        title: Text('sqflite'),
+      ),
+      body: Builder(
+        builder: (context) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              RaisedButton(
                 child: Text(
-                  'Transaction Overview',
-                  style: TextStyle(fontSize: 25, color: Colors.white),
+                  'Query',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
                 ),
+                color: Colors.red,
+                onPressed: () {
+                  var result = _query();
+                  result.then((value) {
+                    if (value.isEmpty) {
+                      showBottomSheet(
+                          context: context,
+                          builder: (context) => Container(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.5,
+                                width: MediaQuery.of(context).size.width,
+                                child: Card(
+                                  elevation: 5,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text("Welcome to the App"),
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.5,
+                                        child: Card(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: TextField(
+                                            controller: number,
+                                            autocorrect: true,
+                                            textAlign: TextAlign.center,
+                                            keyboardType: TextInputType.number,
+                                            decoration: InputDecoration(
+                                              hintText: "Enter Passcode",
+                                              border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(5.0),
+                                                borderSide: BorderSide(
+                                                  color: Colors.amber,
+                                                  style: BorderStyle.solid,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      RaisedButton(
+                                        child: Text(
+                                          'Submit',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        color: Colors.red,
+                                        onPressed: () {
+                                          _insert(number.text);
+                                        },
+                                      ),
+                                      RaisedButton(
+                                        child: Text(
+                                          'Delete',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        color: Colors.red,
+                                        onPressed: () {
+                                          _delete();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ));
+                    } else {
+                      showBottomSheet(
+                          context: context,
+                          builder: (context) => Container(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.5,
+                                width: MediaQuery.of(context).size.width,
+                                child: Card(
+                                  elevation: 5,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text("ENter to cotinue"),
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.5,
+                                        child: Card(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: TextField(
+                                            controller: number,
+                                            autocorrect: true,
+                                            textAlign: TextAlign.center,
+                                            keyboardType: TextInputType.number,
+                                            decoration: InputDecoration(
+                                              hintText: "Enter Passcode",
+                                              border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(5.0),
+                                                borderSide: BorderSide(
+                                                  color: Colors.amber,
+                                                  style: BorderStyle.solid,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      RaisedButton(
+                                        child: Text(
+                                          'check',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        color: Colors.red,
+                                        onPressed: () {
+                                          if (value[0]['code'] == number.text) {
+                                            print("yes");
+                                          } else {
+                                            print("not");
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ));
+                    }
+                  });
+                },
               ),
-              elevation: 5,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(40)),
-            )));
+            ],
+          ),
+        ),
+      ),
+    );
   }
+
+  // Button onPressed methods
+
 }
