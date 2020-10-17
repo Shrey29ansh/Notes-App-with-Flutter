@@ -211,6 +211,18 @@ class _HomePageState extends State<HomePage> {
                   });
                 },
               ),
+              RaisedButton(
+                child: Text(
+                  'Delete',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+                color: Colors.red,
+                onPressed: () {
+                  _delete();
+                },
+              ),
             ],
           ),
         ),

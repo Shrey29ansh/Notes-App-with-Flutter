@@ -17,6 +17,11 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   Random random = new Random();
+  final dbHelper = mainDB.instance;
+  final number = TextEditingController();
+
+  bool _visible = false;
+
   String heading = '';
   String secondarytext = '';
   bool nobiometric = false;
@@ -25,7 +30,29 @@ class _SplashScreenState extends State<SplashScreen> {
   var result;
   var exactval;
   bool wrong = false;
+  String warn = 'Try Again!';
+
+  bool check = false;
+  double _left = 20;
+  double _top = 20;
+  double _right = 20;
+  double _bottom = 20;
   final LocalAuthentication _localAuthentication = LocalAuthentication();
+
+  Future _query() async {
+    final allRows = await dbHelper.queryAllRows();
+    return allRows;
+  }
+
+  void _insert(String passcode) async {
+    // row to insert
+    Map<String, dynamic> row = {
+      mainDB.columnName: '$passcode',
+    };
+    final id = await dbHelper.insert(row);
+    print('inserted row id: $id');
+  }
+
   Future<bool> _isBiometricAvailable() async {
     bool isAvailable = false;
     try {
@@ -82,33 +109,28 @@ class _SplashScreenState extends State<SplashScreen> {
     print(listOfBiometrics);
   }
 
-  int index = 0;
-  int indexe = 0;
-  List colors = [Colors.red, Colors.blue, Colors.yellow];
-
   startTime() async {
-    var _duration = new Duration(seconds: 5);
+    var _duration = new Duration(seconds: 3);
     return new Timer(_duration, navigationPage);
   }
 
-  final dbHelper = mainDB.instance;
-
-  final number = TextEditingController();
-  void _insert(String passcode) async {
-    // row to insert
-    Map<String, dynamic> row = {
-      mainDB.columnName: '$passcode',
-    };
-    final id = await dbHelper.insert(row);
-    print('inserted row id: $id');
+  Future startTimer() async {
+    var _duration = new Duration(milliseconds: 300);
+    return new Timer(_duration, opaa);
   }
 
-  Future _query() async {
-    final allRows = await dbHelper.queryAllRows();
-    return allRows;
+  opaa() async {
+    setState(() {
+      _visible = true;
+    });
   }
 
   navigationPage() async {
+    //_insert('1234');
+    //_delete();
+    setState(() {
+      _bottom = 500;
+    });
     if (!await _isBiometricAvailable()) {
       await _getListOfBiometricTypes();
       await _authenticateUser();
@@ -121,26 +143,28 @@ class _SplashScreenState extends State<SplashScreen> {
         );
       }
     } else {
-      _query();
-      result = _query();
-      result.then((value) {
-        if (value.isEmpty) {
-          setState(() {
-            emptyornot = true;
-            heading = 'Welcome to the App';
-            secondarytext = 'Set an app passcode to continue!';
-            nobiometric = true;
-            
-          });
-        } else {
-          setState(() {
-            exactval = value[0]['code'];
-            emptyornot = false;
-            heading = 'Please Enter passcode to continue';
-            nobiometric = true;
-          });
-        }
-      });
+      print("hello");
+      var value;
+      value = await _query();
+      if (value.isEmpty) {
+        setState(() {
+          exactval = null;
+          heading = 'Welcome to the App';
+          secondarytext = 'Set an app passcode to continue!';
+          print("done");
+          check = true;
+        });
+      } else {
+        setState(() {
+          exactval = value[0]['code'];
+          heading = 'Please Enter passcode to continue';
+          secondarytext = '';
+          print("done");
+          check = true;
+        });
+      }
+      startTimer();
+      //Navigator.of(context).pushReplacement(_createRoute());
     }
   }
 
@@ -153,67 +177,104 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Builder(
-        builder: (context) => Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          color: Colors.black,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              nobiometric
-                  ? showBottomSheet(
-                      context: context,
-                      builder: (context) => Container(
-                            height: 200,
-                            child: Card(
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        color: Colors.black,
+        child: Stack(
+          children: [
+            check
+                ? Center(
+                    child: AnimatedOpacity(
+                      duration: Duration(milliseconds: 500),
+                      opacity: _visible ? 1 : 0,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        height: MediaQuery.of(context).size.height * 0.4,
+                        child: Card(
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 20,
                               ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text("$heading"),
-                                  Text("$secondarytext"),
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.5,
-                                    child: Card(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: TextField(
-                                        controller: number,
-                                        autocorrect: true,
-                                        textAlign: TextAlign.center,
-                                        keyboardType: TextInputType.number,
-                                        decoration: InputDecoration(
-                                          hintText: "Do remember this thing..",
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(5.0),
-                                            borderSide: BorderSide(
-                                              color: Colors.amber,
-                                              style: BorderStyle.solid,
-                                            ),
-                                          ),
+                              Text(
+                                "$heading",
+                                style: TextStyle(color: Colors.black),
+                              ),
+                              Text(
+                                "$secondarytext",
+                                style: TextStyle(color: Colors.black),
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.4,
+                                child: Card(
+                                  child: TextField(
+                                    controller: number,
+                                    autocorrect: true,
+                                    textAlign: TextAlign.center,
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      hintText: "Do remember this thing..",
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(5.0),
+                                        borderSide: BorderSide(
+                                          color: Colors.amber,
+                                          style: BorderStyle.solid,
                                         ),
                                       ),
                                     ),
                                   ),
-                                  wrong ? Text("Wrong") : Container(),
-                                  RaisedButton(
-                                    child: Text(
-                                      'Submit',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    color: Colors.red,
-                                    onPressed: () {
-                                      if (emptyornot) {
-                                        _insert(number.text);
+                                ),
+                              ),
+                              wrong
+                                  ? Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "$warn",
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                        warn == "required*"
+                                            ? Container()
+                                            : Icon(
+                                                Icons.warning,
+                                                color: Colors.red,
+                                              )
+                                      ],
+                                    )
+                                  : Container(),
+                              RaisedButton(
+                                child: Text(
+                                  'Submit',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                color: Colors.blue,
+                                onPressed: () {
+                                  print(number.text);
+                                  if (number.text.isEmpty) {
+                                    setState(() {
+                                      warn = "required*";
+                                    });
+                                  } else {
+                                    if (exactval == null) {
+                                      _insert(number.text);
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => HomePage(),
+                                        ),
+                                      );
+                                    } else {
+                                      if (exactval == number.text) {
                                         Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(
@@ -221,25 +282,31 @@ class _SplashScreenState extends State<SplashScreen> {
                                           ),
                                         );
                                       } else {
-                                        if (exactval == number.text) {
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => HomePage(),
-                                            ),
-                                          );
-                                        } else {
+                                        setState(() {
+                                          warn = 'Try Again!';
                                           wrong = true;
-                                        }
+                                        });
                                       }
-                                    },
-                                  ),
-                                ],
+                                    }
+                                  }
+                                  number.clear();
+                                },
                               ),
-                            ),
-                          ))
-                  : Container(),
-              Row(
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : Container(),
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 1000),
+              curve: Curves.fastOutSlowIn,
+              left: _left,
+              top: _top,
+              right: _right,
+              bottom: _bottom,
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
@@ -257,8 +324,8 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
