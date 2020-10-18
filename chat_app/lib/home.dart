@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:chat_app/database_helper.dart';
-import 'package:flutter/services.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -9,41 +7,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final dbHelper = mainDB.instance;
-
-  final number = TextEditingController();
-  void _insert(String passcode) async {
-    // row to insert
-    Map<String, dynamic> row = {
-      mainDB.columnName: '$passcode',
-    };
-    final id = await dbHelper.insert(row);
-    print('inserted row id: $id');
-  }
-
-  Future _query() async {
-    final allRows = await dbHelper.queryAllRows();
-    return allRows;
-  }
-
-/*
-  void _update() async {
-    // row to update
-    Map<String, dynamic> row = {
-      DatabaseHelper.columnId: 1,
-      DatabaseHelper.columnName: 'Mary',
-    };
-    final rowsAffected = await dbHelper.update(row);
-    print('updated $rowsAffected row(s)');
-  }
-*/
-  void _delete() async {
-    // Assuming that the number of rows is the id for the last row.
-    final id = await dbHelper.queryRowCount();
-    final rowsDeleted = await dbHelper.delete(id);
-    print('deleted $rowsDeleted row(s): row $id');
-  }
-
   @override
   void initState() {
     super.initState();
@@ -52,184 +15,191 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('sqflite'),
+        appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: Colors.black,
+          title: Text('NoteShare'),
+        ),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: () {
+            showDialog(
+                context: context,
+                builder: (_) {
+                  return AlertBox();
+                });
+          },
+          backgroundColor: Colors.amber,
+          splashColor: Colors.yellow,
+          hoverColor: Colors.red,
+        ),
+        body: Container(
+          color: Colors.black,
+        ));
+  }
+}
+
+class AlertBox extends StatefulWidget {
+  @override
+  _AlertBoxState createState() => _AlertBoxState();
+}
+
+class _AlertBoxState extends State<AlertBox> {
+  final nametext = TextEditingController(),
+      username = TextEditingController(),
+      password = TextEditingController(),
+      comments = TextEditingController();
+  bool visibility = false;
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
       ),
-      body: Builder(
-        builder: (context) => Center(
+      title: Container(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            new Text(
+              "Create new locker",
+              style: TextStyle(),
+            ),
+            Icon(Icons.lock),
+          ],
+        ),
+      ),
+      content: new Container(
+        child: SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              RaisedButton(
-                child: Text(
-                  'Query',
-                  style: TextStyle(
-                    color: Colors.white,
+            children: [
+              Text("Name of locker*"),
+              TextField(
+                cursorHeight: 20,
+                onTap: () {
+                  setState(() {});
+                },
+                cursorColor: Colors.black,
+                controller: nametext,
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(
+                  focusColor: Colors.blue,
+                  prefixIcon: Icon(Icons.phonelink_lock),
+                  errorStyle: TextStyle(),
+                  hintText: "eg.Main Account",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
-                color: Colors.red,
-                onPressed: () {
-                  var result = _query();
-                  result.then((value) {
-                    if (value.isEmpty) {
-                      showBottomSheet(
-                          context: context,
-                          builder: (context) => Container(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.5,
-                                width: MediaQuery.of(context).size.width,
-                                child: Card(
-                                  elevation: 5,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text("Welcome to the App"),
-                                      Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.5,
-                                        child: Card(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          child: TextField(
-                                            controller: number,
-                                            autocorrect: true,
-                                            textAlign: TextAlign.center,
-                                            keyboardType: TextInputType.number,
-                                            decoration: InputDecoration(
-                                              hintText: "Enter Passcode",
-                                              border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(5.0),
-                                                borderSide: BorderSide(
-                                                  color: Colors.amber,
-                                                  style: BorderStyle.solid,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      RaisedButton(
-                                        child: Text(
-                                          'Submit',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        color: Colors.red,
-                                        onPressed: () {
-                                          _insert(number.text);
-                                        },
-                                      ),
-                                      RaisedButton(
-                                        child: Text(
-                                          'Delete',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        color: Colors.red,
-                                        onPressed: () {
-                                          _delete();
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ));
-                    } else {
-                      showBottomSheet(
-                          context: context,
-                          builder: (context) => Container(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.5,
-                                width: MediaQuery.of(context).size.width,
-                                child: Card(
-                                  elevation: 5,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text("ENter to cotinue"),
-                                      Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.5,
-                                        child: Card(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          child: TextField(
-                                            controller: number,
-                                            autocorrect: true,
-                                            textAlign: TextAlign.center,
-                                            keyboardType: TextInputType.number,
-                                            decoration: InputDecoration(
-                                              hintText: "Enter Passcode",
-                                              border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(5.0),
-                                                borderSide: BorderSide(
-                                                  color: Colors.amber,
-                                                  style: BorderStyle.solid,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      RaisedButton(
-                                        child: Text(
-                                          'check',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        color: Colors.red,
-                                        onPressed: () {
-                                          if (value[0]['code'] == number.text) {
-                                            print("yes");
-                                          } else {
-                                            print("not");
-                                          }
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ));
-                    }
-                  });
-                },
               ),
-              RaisedButton(
-                child: Text(
-                  'Delete',
-                  style: TextStyle(
-                    color: Colors.white,
+              SizedBox(
+                height: 10,
+              ),
+              Text("Username/Email*"),
+              TextField(
+                cursorHeight: 20,
+                onTap: () {
+                  setState(() {});
+                },
+                cursorColor: Colors.black,
+                controller: username,
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.email),
+                  focusColor: Colors.blue,
+                  errorStyle: TextStyle(),
+                  hintText: "Mainaccount@x.com",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
-                color: Colors.red,
-                onPressed: () {
-                  _delete();
-                },
               ),
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  Text("Password*"),
+                ],
+              ),
+              TextField(
+                cursorHeight: 20,
+                cursorColor: Colors.black,
+                controller: password,
+                obscureText: !visibility,
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.vpn_key),
+                  suffixIcon: visibility
+                      ? InkWell(
+                          child: Icon(
+                            Icons.visibility_off,
+                            color: Colors.grey[500],
+                          ),
+                          onTap: () => setState(() {
+                                visibility = !visibility;
+                              }))
+                      : InkWell(
+                          child: Icon(Icons.visibility),
+                          onTap: () => setState(() {
+                                visibility = !visibility;
+                              })),
+                  focusColor: Colors.blue,
+                  errorStyle: TextStyle(),
+                  hintText: "Password",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Text("Comments (optional)"),
+              TextField(
+                cursorHeight: 20,
+                onTap: () {
+                  setState(() {});
+                },
+                cursorColor: Colors.black,
+                controller: comments,
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(
+                  focusColor: Colors.blue,
+                  errorStyle: TextStyle(),
+                  hintText: "Extra Info",
+                  prefixIcon: Icon(Icons.comment),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Center(
+                child: RaisedButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  elevation: 5,
+                  child: Text(
+                    'Create',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  color: Colors.blue,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              )
             ],
           ),
         ),
       ),
     );
   }
-
-  // Button onPressed methods
-
 }

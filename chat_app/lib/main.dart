@@ -17,26 +17,16 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   Random random = new Random();
-  final dbHelper = mainDB.instance;
-  final number = TextEditingController();
-
-  bool _visible = false;
-
-  String heading = '';
-  String secondarytext = '';
-  bool nobiometric = false;
-  bool nextscreen = false;
-  bool emptyornot;
-  var result;
-  var exactval;
-  bool wrong = false;
-  String warn = 'Try Again!';
-
-  bool check = false;
-  double _left = 20;
-  double _top = 20;
-  double _right = 20;
-  double _bottom = 20;
+  final dbHelper = mainDB.instance, number = TextEditingController();
+  bool _visible = false,
+      nobiometric = false,
+      nextscreen = false,
+      emptyornot,
+      wrong = false,
+      check = false;
+  AlignmentDirectional _animatedcontainer = AlignmentDirectional(0.0, 0.7);
+  String heading = '', secondarytext = '';
+  var result, exactval, warn = null;
   final LocalAuthentication _localAuthentication = LocalAuthentication();
 
   Future _query() async {
@@ -74,8 +64,7 @@ class _SplashScreenState extends State<SplashScreen> {
     bool isAuthenticated = false;
     try {
       isAuthenticated = await _localAuthentication.authenticateWithBiometrics(
-        localizedReason:
-            "Please authenticate to view your transaction overview",
+        localizedReason: "Please authenticate to start using the app",
         useErrorDialogs: true,
         stickyAuth: true,
       );
@@ -121,6 +110,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   opaa() async {
     setState(() {
+      _animatedcontainer = AlignmentDirectional(0.0, -0.7);
       _visible = true;
     });
   }
@@ -128,10 +118,8 @@ class _SplashScreenState extends State<SplashScreen> {
   navigationPage() async {
     //_insert('1234');
     //_delete();
-    setState(() {
-      _bottom = 500;
-    });
-    if (!await _isBiometricAvailable()) {
+    setState(() {});
+    if (await _isBiometricAvailable()) {
       await _getListOfBiometricTypes();
       await _authenticateUser();
       if (nextscreen) {
@@ -157,8 +145,8 @@ class _SplashScreenState extends State<SplashScreen> {
       } else {
         setState(() {
           exactval = value[0]['code'];
-          heading = 'Please Enter passcode to continue';
-          secondarytext = '';
+          heading = 'Welcome back';
+          secondarytext = 'Enter passcode';
           print("done");
           check = true;
         });
@@ -177,104 +165,135 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        color: Colors.black,
-        child: Stack(
-          children: [
-            check
-                ? Center(
-                    child: AnimatedOpacity(
-                      duration: Duration(milliseconds: 500),
-                      opacity: _visible ? 1 : 0,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * 0.8,
-                        height: MediaQuery.of(context).size.height * 0.4,
-                        child: Card(
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                height: 20,
-                              ),
-                              Text(
-                                "$heading",
-                                style: TextStyle(color: Colors.black),
-                              ),
-                              Text(
-                                "$secondarytext",
-                                style: TextStyle(color: Colors.black),
-                              ),
-                              Container(
-                                width: MediaQuery.of(context).size.width * 0.4,
-                                child: Card(
-                                  child: TextField(
-                                    controller: number,
-                                    autocorrect: true,
-                                    textAlign: TextAlign.center,
-                                    keyboardType: TextInputType.number,
-                                    decoration: InputDecoration(
-                                      hintText: "Do remember this thing..",
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(5.0),
-                                        borderSide: BorderSide(
-                                          color: Colors.amber,
-                                          style: BorderStyle.solid,
+      body: Center(
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          color: Colors.black,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedContainer(
+                duration: Duration(milliseconds: 6000),
+                alignment: _animatedcontainer,
+                child: Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.notes,
+                        color: Colors.white,
+                        size: 50,
+                      ),
+                      Text(
+                        "Note",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: 30),
+                      ),
+                      Text(
+                        "Share",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                            fontSize: 30),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              check
+                  ? Align(
+                      alignment: Alignment.center,
+                      child: AnimatedOpacity(
+                        duration: Duration(milliseconds: 500),
+                        opacity: _visible ? 1 : 0,
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          height: MediaQuery.of(context).size.height * 0.4,
+                          child: Card(
+                            elevation: 10,
+                            color: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Text(
+                                          "$heading",
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20),
+                                        ),
+                                        Text(
+                                          "$secondarytext",
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.7,
+                                  child: Directionality(
+                                    textDirection: TextDirection.ltr,
+                                    child: TextField(
+                                      onTap: () {
+                                        setState(() {});
+                                      },
+                                      obscureText: true,
+                                      cursorColor: Colors.black,
+                                      controller: number,
+                                      autocorrect: true,
+                                      textAlign: TextAlign.center,
+                                      keyboardType: TextInputType.number,
+                                      decoration: InputDecoration(
+                                        focusColor: Colors.blue,
+                                        errorText: warn,
+                                        errorStyle: TextStyle(),
+                                        hintText: "Enter PIN",
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                          borderSide: BorderSide(
+                                            color: Colors.amber,
+                                            style: BorderStyle.solid,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              wrong
-                                  ? Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          "$warn",
-                                          style: TextStyle(color: Colors.red),
-                                        ),
-                                        warn == "required*"
-                                            ? Container()
-                                            : Icon(
-                                                Icons.warning,
-                                                color: Colors.red,
-                                              )
-                                      ],
-                                    )
-                                  : Container(),
-                              RaisedButton(
-                                child: Text(
-                                  'Submit',
-                                  style: TextStyle(
-                                    color: Colors.white,
+                                RaisedButton(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
                                   ),
-                                ),
-                                color: Colors.blue,
-                                onPressed: () {
-                                  print(number.text);
-                                  if (number.text.isEmpty) {
-                                    setState(() {
-                                      warn = "required*";
-                                    });
-                                  } else {
-                                    if (exactval == null) {
-                                      _insert(number.text);
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => HomePage(),
-                                        ),
-                                      );
+                                  elevation: 5,
+                                  child: Text(
+                                    'Submit',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  color: Colors.blue,
+                                  onPressed: () {
+                                    print(number.text);
+                                    if (number.text.isEmpty) {
+                                      setState(() {
+                                        warn = "Pin is required";
+                                      });
                                     } else {
-                                      if (exactval == number.text) {
+                                      if (exactval == null) {
+                                        _insert(number.text);
                                         Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(
@@ -282,50 +301,33 @@ class _SplashScreenState extends State<SplashScreen> {
                                           ),
                                         );
                                       } else {
-                                        setState(() {
-                                          warn = 'Try Again!';
-                                          wrong = true;
-                                        });
+                                        if (exactval == number.text) {
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => HomePage(),
+                                            ),
+                                          );
+                                        } else {
+                                          setState(() {
+                                            warn = 'Try Again!';
+                                            wrong = true;
+                                          });
+                                        }
                                       }
                                     }
-                                  }
-                                  number.clear();
-                                },
-                              ),
-                            ],
+                                    number.clear();
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  )
-                : Container(),
-            AnimatedPositioned(
-              duration: const Duration(milliseconds: 1000),
-              curve: Curves.fastOutSlowIn,
-              left: _left,
-              top: _top,
-              right: _right,
-              bottom: _bottom,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.notes,
-                    color: Colors.red,
-                    size: 50,
-                  ),
-                  Text(
-                    "Note",
-                    style: TextStyle(color: Colors.white, fontSize: 30),
-                  ),
-                  Text(
-                    "Share",
-                    style: TextStyle(color: Colors.white, fontSize: 30),
-                  ),
-                ],
-              ),
-            ),
-          ],
+                    )
+                  : Container(),
+            ],
+          ),
         ),
       ),
     );
