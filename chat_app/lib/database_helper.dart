@@ -61,6 +61,70 @@ class mainDB {
   }
 }
 
+class CreateNotes {
+  static final _databaseName = "MyDatabase.db";
+  static final _databaseVersion = 1;
+  static final columnId = 'id',
+      columnName = 'lockername',
+      columnUsername = 'username',
+      password = 'password',
+      comments = 'comments';
+  static final table = 'notes';
+  CreateNotes._privateConstructor();
+  static final CreateNotes instance = CreateNotes._privateConstructor();
+  static Database _database;
+
+  // this function will check if db xist or not
+  Future<Database> get database async {
+    if (_database != null) return _database;
+    // lazily instantiate the db the first time it is accessed
+    _database = await _initDatabase();
+    return _database;
+  }
+
+  // this opens the database (and creates it if it doesn't exist)
+  _initDatabase() async {
+    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    String path = join(documentsDirectory.path, _databaseName);
+    print(path);
+    return await openDatabase(path,
+        version: _databaseVersion, onCreate: _onCreate);
+  }
+
+  Future _onCreate(Database db, int version) async {
+    await db.execute('''
+          CREATE TABLE $table (
+            $columnId INTEGER PRIMARY KEY,
+            $columnName TEXT NOT NULL,
+            $columnUsername TEXT NOT NULL,
+            $password TEXT NOT NULL,
+            $comments TEXT NOT NULL
+            )
+          ''');
+  }
+
+  Future<int> insert(Map<String, dynamic> row) async {
+    print(row);
+    Database db = await instance.database;
+    return await db.insert(table, row);
+  }
+
+  Future<List<Map<String, dynamic>>> checkName(String lockerName) async {
+    Database db = await instance.database;
+    return await db.query(table, where: "$columnName = '$lockerName'");
+  }
+
+  Future<int> delete(String name) async {
+    Database db = await instance.database;
+    return await db.delete(table, where: '$columnName = ?', whereArgs: [name]);
+  }
+
+  Future<List<Map<String, dynamic>>> queryAllRows() async {
+    Database db = await instance.database;
+    return await db.query(table);
+  }
+}
+
 /*   Future<List<Map<String, dynamic>>> queryAllRows() async {
     Database db = await instance.database;
     return await db.query(table);

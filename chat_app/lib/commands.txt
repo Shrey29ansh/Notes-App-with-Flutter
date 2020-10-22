@@ -1,0 +1,1 @@
+adb -e emu finger touch 1155aa1155
