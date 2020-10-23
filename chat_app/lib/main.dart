@@ -116,9 +116,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   navigationPage() async {
-    //_insert('1234');
-    //_delete();
-    setState(() {});
+  
     if (await _isBiometricAvailable()) {
       await _getListOfBiometricTypes();
       await _authenticateUser();

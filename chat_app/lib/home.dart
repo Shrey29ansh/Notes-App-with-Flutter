@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:local_auth/local_auth.dart';
 import 'database_helper.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,11 +15,11 @@ int colorindex = 0;
 StreamController _streamController;
 Stream _stream;
 List colors = [
-  Colors.black,
-  Colors.green,
-  Colors.yellow,
-  Colors.red,
-  Colors.blue
+  Colors.blueAccent,
+  Colors.deepOrange,
+  Colors.blue[800],
+  Colors.red[900],
+  Colors.teal
 ];
 
 Stream getList() async* {
@@ -28,6 +30,63 @@ Stream getList() async* {
 }
 
 class _HomePageState extends State<HomePage> {
+  final LocalAuthentication _localAuthentication = LocalAuthentication();
+  bool nextscreen = false;
+  Future<bool> _isBiometricAvailable() async {
+    bool isAvailable = false;
+    try {
+      isAvailable = await _localAuthentication.canCheckBiometrics;
+    } on PlatformException catch (e) {
+      print(e);
+    }
+
+    if (!mounted) return isAvailable;
+
+    isAvailable
+        ? print('Biometric is available!')
+        : print('Biometric is unavailable.');
+
+    return isAvailable;
+  }
+
+  Future<void> _authenticateUser() async {
+    bool isAuthenticated = false;
+    try {
+      isAuthenticated = await _localAuthentication.authenticateWithBiometrics(
+        localizedReason: "Please authenticate to start using the app",
+        useErrorDialogs: true,
+        stickyAuth: true,
+      );
+    } on PlatformException catch (e) {
+      print(e);
+    }
+
+    if (!mounted) return;
+
+    isAuthenticated
+        ? print('User is authenticated!')
+        : print('User is not authenticated.');
+
+    if (isAuthenticated) {
+      setState(() {
+        nextscreen = true;
+      });
+    }
+  }
+
+  Future<void> _getListOfBiometricTypes() async {
+    List<BiometricType> listOfBiometrics;
+    try {
+      listOfBiometrics = await _localAuthentication.getAvailableBiometrics();
+    } on PlatformException catch (e) {
+      print(e);
+    }
+
+    if (!mounted) return;
+
+    print(listOfBiometrics);
+  }
+
   @override
   void initState() {
     getList().listen((event) {
@@ -43,7 +102,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          backgroundColor: Colors.grey[900],
+          backgroundColor: Colors.black,
           title: Text('NoteShare'),
         ),
         floatingActionButton: FloatingActionButton(
@@ -60,15 +119,14 @@ class _HomePageState extends State<HomePage> {
           hoverColor: Colors.red,
         ),
         body: Container(
-          color: Colors.grey[900],
+          color: Colors.black,
           child: StreamBuilder(
             stream: _stream,
             builder: (BuildContext ctx, AsyncSnapshot snapshot) {
               if (snapshot.data == null) {
                 print("nothing");
                 return Center(
-                  child: Container(
-                      color: Colors.black, child: CircularProgressIndicator()),
+                  child: CircularProgressIndicator(),
                 );
               }
               if (snapshot.data.length == 0) {
@@ -90,7 +148,6 @@ class _HomePageState extends State<HomePage> {
                 );
               }
               return GridView.builder(
-                  padding: EdgeInsets.all(10),
                   itemCount: snapshot.data.length,
                   gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2),
@@ -99,43 +156,74 @@ class _HomePageState extends State<HomePage> {
                     if (colorindex == 5) {
                       colorindex = 0;
                     }
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Card(
-                          elevation: 10,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          color: colors[colorindex],
-                          child: Center(
-                            child: Stack(
-                              children: [
-                                Positioned(
-                                    right: 70,
-                                    top: 30,
-                                    child: Icon(
-                                      Icons.vpn_key,
-                                      size: 150,
-                                      color: Colors.white.withOpacity(0.1),
-                                    )),
-                                Positioned(
-                                    left: 70,
-                                    top: 10,
-                                    child: Icon(
+                    return Container(
+                      child: Stack(
+                        children: [
+                          Align(
+                              alignment: Alignment.topCenter,
+                              child: CircleAvatar(
+                                backgroundColor: Colors.white,
+                                radius: 30,
+                                child: Column(
+                                  children: [
+                                    Icon(
                                       Icons.lock,
-                                      size: 150,
-                                      color: Colors.white.withOpacity(0.1),
-                                    )),
-                                Center(
-                                  child: Text(
-                                    '${snapshot.data[index]['lockername']}',
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 15),
-                                  ),
+                                      size: 25,
+                                      color: colors[colorindex],
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              )),
+                          Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: InkWell(
+                              splashColor: Colors.blue,
+                              onTap: () async {
+                                if (await _isBiometricAvailable()) {
+                                  await _getListOfBiometricTypes();
+                                  await _authenticateUser();
+                                  if (nextscreen) {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => HomePage(),
+                                      ),
+                                    );
+                                  }
+                                }
+                              },
+                              child: Card(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  elevation: 2,
+                                  shadowColor: colors[colorindex],
+                                  color: colors[colorindex],
+                                  child: Stack(
+                                    children: [
+                                      Positioned(
+                                        top: 1,
+                                        right: 20,
+                                        child: Icon(
+                                          Icons.vpn_key,
+                                          size: 150,
+                                          color: Colors.black.withOpacity(0.8),
+                                        ),
+                                      ),
+                                      Center(
+                                        child: Text(
+                                          '${snapshot.data[index]['lockername']}',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 25,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ],
+                                  )),
                             ),
-                          )),
+                          ),
+                        ],
+                      ),
                     );
                   });
             },
