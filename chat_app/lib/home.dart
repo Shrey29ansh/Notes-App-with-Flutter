@@ -1,8 +1,9 @@
 import 'dart:async';
 
+import 'package:chat_app/locker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+// ignore: unused_import
 import 'package:local_auth/local_auth.dart';
 import 'database_helper.dart';
 
@@ -11,81 +12,31 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-int colorindex = 0;
 StreamController _streamController;
 Stream _stream;
-List colors = [
-  Colors.blueAccent,
-  Colors.deepOrange,
-  Colors.blue[800],
-  Colors.red[900],
-  Colors.teal
-];
 
 Stream getList() async* {
-  final dbHelper = CreateNotes.instance;
-  final allRows = await dbHelper.queryAllRows();
-  print(allRows.length);
-  _streamController.add(allRows);
+  try {
+    final dbHelper = CreateNotes.instance;
+    final allRows = await dbHelper.queryAllRows();
+    print(allRows);
+    _streamController.add(allRows);
+  } catch (e) {
+    print(e);
+  }
 }
 
 class _HomePageState extends State<HomePage> {
-  final LocalAuthentication _localAuthentication = LocalAuthentication();
-  bool nextscreen = false;
-  Future<bool> _isBiometricAvailable() async {
-    bool isAvailable = false;
-    try {
-      isAvailable = await _localAuthentication.canCheckBiometrics;
-    } on PlatformException catch (e) {
-      print(e);
-    }
+  int colorindex = 0;
+  final dbHelper = CreateNotes.instance;
 
-    if (!mounted) return isAvailable;
-
-    isAvailable
-        ? print('Biometric is available!')
-        : print('Biometric is unavailable.');
-
-    return isAvailable;
-  }
-
-  Future<void> _authenticateUser() async {
-    bool isAuthenticated = false;
-    try {
-      isAuthenticated = await _localAuthentication.authenticateWithBiometrics(
-        localizedReason: "Please authenticate to start using the app",
-        useErrorDialogs: true,
-        stickyAuth: true,
-      );
-    } on PlatformException catch (e) {
-      print(e);
-    }
-
-    if (!mounted) return;
-
-    isAuthenticated
-        ? print('User is authenticated!')
-        : print('User is not authenticated.');
-
-    if (isAuthenticated) {
-      setState(() {
-        nextscreen = true;
-      });
-    }
-  }
-
-  Future<void> _getListOfBiometricTypes() async {
-    List<BiometricType> listOfBiometrics;
-    try {
-      listOfBiometrics = await _localAuthentication.getAvailableBiometrics();
-    } on PlatformException catch (e) {
-      print(e);
-    }
-
-    if (!mounted) return;
-
-    print(listOfBiometrics);
-  }
+  List colors = [
+    Colors.blueAccent,
+    Colors.deepOrange,
+    Colors.blue[800],
+    Colors.red[900],
+    Colors.teal
+  ];
 
   @override
   void initState() {
@@ -125,9 +76,7 @@ class _HomePageState extends State<HomePage> {
             builder: (BuildContext ctx, AsyncSnapshot snapshot) {
               if (snapshot.data == null) {
                 print("nothing");
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
+                return Center(child: CircularProgressIndicator());
               }
               if (snapshot.data.length == 0) {
                 return Center(
@@ -152,9 +101,10 @@ class _HomePageState extends State<HomePage> {
                   gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2),
                   itemBuilder: (BuildContext context, int index) {
-                    colorindex++;
-                    if (colorindex == 5) {
-                      colorindex = 0;
+                    bool checkval = true;
+                    if (index > 4) {
+                      colorindex = index % 5;
+                      checkval = false;
                     }
                     return Container(
                       child: Stack(
@@ -169,7 +119,9 @@ class _HomePageState extends State<HomePage> {
                                     Icon(
                                       Icons.lock,
                                       size: 25,
-                                      color: colors[colorindex],
+                                      color: checkval
+                                          ? colors[index]
+                                          : colors[colorindex],
                                     ),
                                   ],
                                 ),
@@ -179,25 +131,34 @@ class _HomePageState extends State<HomePage> {
                             child: InkWell(
                               splashColor: Colors.blue,
                               onTap: () async {
-                                if (await _isBiometricAvailable()) {
-                                  await _getListOfBiometricTypes();
-                                  await _authenticateUser();
-                                  if (nextscreen) {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => HomePage(),
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Locker(
+                                        lockername: snapshot.data[index]
+                                            ['lockername'],
+                                        username: snapshot.data[index]
+                                            ['username'],
+                                        password: snapshot.data[index]
+                                            ['password'],
+                                        comments: snapshot.data[index]
+                                            ['comments'],
+                                        color: checkval
+                                            ? colors[index]
+                                            : colors[colorindex],
                                       ),
-                                    );
-                                  }
-                                }
+                                    ));
                               },
                               child: Card(
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10)),
                                   elevation: 2,
-                                  shadowColor: colors[colorindex],
-                                  color: colors[colorindex],
+                                  shadowColor: checkval
+                                      ? colors[index]
+                                      : colors[colorindex],
+                                  color: checkval
+                                      ? colors[index]
+                                      : colors[colorindex],
                                   child: Stack(
                                     children: [
                                       Positioned(
@@ -253,33 +214,45 @@ class _AlertBoxState extends State<AlertBox> {
       passfocus = FocusNode(),
       comfocus = FocusNode();
   bool visibility = false;
-  final dbHelper = CreateNotes.instance;
   bool touched = false;
 
   void changefocus() async {
     if (!_myfocus.hasFocus) {
       var check = await checklocker(nametext.text);
-      if (!check.isEmpty) {
-        setState(() {
-          namerror = true;
-          warning = "This Lockername already exist";
-        });
-      } else {
+      if (check == null) {
         setState(() {
           namerror = false;
         });
+      } else {
+        if (!check.isEmpty) {
+          setState(() {
+            namerror = true;
+            warning = "This Lockername already exist";
+          });
+        } else {
+          setState(() {
+            namerror = false;
+          });
+        }
       }
     }
   }
 
   Future checklocker(String lockername) async {
     //final ffr = await dbHelper.delete('gmail');
-    final result = await dbHelper.checkName(lockername);
-    return result;
+    try {
+      final dbHelper = CreateNotes.instance;
+      final result = await dbHelper.checkName(lockername);
+      return result;
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future insertNotes(String namefield, String usernamefield,
       String passwordfield, String commentsfield) async {
+    final dbHelper = CreateNotes.instance;
+
     Map<String, dynamic> row = {
       CreateNotes.columnName: namefield,
       CreateNotes.columnUsername: usernamefield,
@@ -350,24 +323,36 @@ class _AlertBoxState extends State<AlertBox> {
                       onPressed: () async {
                         if (_myfocus.hasFocus) {
                           var check = await checklocker(nametext.text);
-                          if (!check.isEmpty) {
-                            setState(() {
-                              namerror = true;
-                              warning = "This Lockername already exist";
-                            });
-                          } else {
+
+                          if (check == null) {
                             setState(() {
                               namerror = false;
                             });
+                          } else {
+                            if (!check.isEmpty) {
+                              setState(() {
+                                namerror = true;
+                                warning = "This Lockername already exist";
+                              });
+                            } else {
+                              setState(() {
+                                namerror = false;
+                              });
+                            }
                           }
                         }
                         if (_formKey.currentState.validate()) {
                           if (!namerror) {
                             //logic for db entry
-                            await insertNotes(nametext.text, username.text,
-                                password.text, comments.text);
-                            final allRows = await dbHelper.queryAllRows();
-                            _streamController.add(allRows);
+                            try {
+                              await insertNotes(nametext.text, username.text,
+                                  password.text, comments.text);
+                              final dbHelper = CreateNotes.instance;
+                              final allRows = await dbHelper.queryAllRows();
+                              _streamController.add(allRows);
+                            } catch (e) {
+                              print(e);
+                            }
                           }
                         } else {
                           print("false");

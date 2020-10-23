@@ -62,7 +62,7 @@ class mainDB {
 }
 
 class CreateNotes {
-  static final _databaseName = "MyDatabase.db";
+  static final _databaseName = "MyDatabase2.db";
   static final _databaseVersion = 1;
   static final columnId = 'id',
       columnName = 'lockername',

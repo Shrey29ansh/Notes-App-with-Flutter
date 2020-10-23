@@ -16,8 +16,9 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final dbHelper = mainDB.instance;
   Random random = new Random();
-  final dbHelper = mainDB.instance, number = TextEditingController();
+  final number = TextEditingController();
   bool _visible = false,
       nobiometric = false,
       nextscreen = false,
@@ -116,7 +117,6 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   navigationPage() async {
-  
     if (await _isBiometricAvailable()) {
       await _getListOfBiometricTypes();
       await _authenticateUser();
