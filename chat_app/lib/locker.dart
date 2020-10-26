@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
+// ignore: unused_import
 import 'package:chat_app/home.dart';
 import 'package:flutter/services.dart';
 import 'package:chat_app/database_helper.dart';
@@ -42,6 +42,7 @@ class _LockerState extends State<Locker> {
   }
 
   bool wrong = false, _visible = false;
+  // ignore: avoid_init_to_null
   var warn = null;
   Future<bool> _isBiometricAvailable() async {
     bool isAvailable = false;
@@ -109,7 +110,6 @@ class _LockerState extends State<Locker> {
     });
   }
 
-  AlignmentDirectional _animatedcontainer = AlignmentDirectional(0.0, 0.7);
 
   Future startTimer() async {
     var _duration = new Duration(milliseconds: 300);
@@ -118,7 +118,6 @@ class _LockerState extends State<Locker> {
 
   opaa() async {
     setState(() {
-      _animatedcontainer = AlignmentDirectional(0.0, -0.7);
       _visible = true;
     });
   }

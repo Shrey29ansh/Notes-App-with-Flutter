@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:chat_app/home.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:chat_app/database_helper.dart';
 
@@ -17,6 +18,17 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   final dbHelper = mainDB.instance;
+  List directioncircle;
+  List aligncircle = [
+    Alignment.topCenter,
+    Alignment.centerRight,
+    Alignment.bottomCenter,
+    Alignment.centerLeft
+  ];
+  List alignline = [
+    Alignment.topLeft,
+    Alignment.topRight,
+  ];
   Random random = new Random();
   final number = TextEditingController();
   bool _visible = false,
@@ -27,9 +39,10 @@ class _SplashScreenState extends State<SplashScreen> {
       check = false;
   AlignmentDirectional _animatedcontainer = AlignmentDirectional(0.0, 0.7);
   String heading = '', secondarytext = '';
+  // ignore: avoid_init_to_null
   var result, exactval, warn = null;
   final LocalAuthentication _localAuthentication = LocalAuthentication();
-
+  bool _cont = false;
   Future _query() async {
     final allRows = await dbHelper.queryAllRows();
     return allRows;
@@ -100,13 +113,37 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   startTime() async {
-    var _duration = new Duration(seconds: 3);
+    setState(() {});
+    var _duration = new Duration(seconds: 5);
     return new Timer(_duration, navigationPage);
   }
 
   Future startTimer() async {
     var _duration = new Duration(milliseconds: 300);
     return new Timer(_duration, opaa);
+  }
+
+  var o = 0, t = 1, th = 2, f = 3, lined = 0;
+  startcircleTime() async {
+    var _duration = new Duration(seconds: 1);
+    return new Timer.periodic(_duration, (timer) {
+      if (nextscreen) {
+        timer.cancel();
+      } else {
+        if (timer.tick == 1) {
+          setState(() {
+            _cont = true;
+          });
+        }
+        setState(() {
+          o = (o + 1) % 4;
+          t = (t + 1) % 4;
+          th = (th + 1) % 4;
+          f = (f + 1) % 4;
+          lined = (lined + 1) % 2;
+        });
+      }
+    });
   }
 
   opaa() async {
@@ -157,6 +194,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    startcircleTime();
     startTime();
   }
 
@@ -171,32 +209,89 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              AnimatedContainer(
-                duration: Duration(milliseconds: 6000),
-                alignment: _animatedcontainer,
+              AnimatedOpacity(
+                opacity: _cont ? 1 : 0,
+                duration: Duration(milliseconds: 500),
+                curve: Curves.easeIn,
                 child: Container(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        Icons.notes,
+                        Icons.edit,
                         color: Colors.white,
-                        size: 50,
+                        size: 40,
                       ),
+                      Text("Note",
+                          style: GoogleFonts.montserratAlternates(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: 30,
+                          )),
                       Text(
-                        "Note",
-                        style: TextStyle(
+                        "Share",
+                        style: GoogleFonts.montserratAlternates(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                             fontSize: 30),
                       ),
-                      Text(
-                        "Share",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.red,
-                            fontSize: 30),
+                    ],
+                  ),
+                ),
+              ),
+              Container(
+                height: MediaQuery.of(context).size.width * 0.37,
+                width: MediaQuery.of(context).size.width * 0.35,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Stack(
+                    children: [
+                      AnimatedContainer(
+                        curve: Curves.easeOutQuint,
+                        alignment: aligncircle[o],
+                        duration: Duration(milliseconds: 700),
+                        child: CircleAvatar(
+                            radius: 18,
+                            backgroundColor: Colors.white,
+                            child: Icon(
+                              Icons.vpn_key,
+                            )),
                       ),
+                      AnimatedContainer(
+                        curve: Curves.easeOutQuint,
+                        alignment: aligncircle[t],
+                        duration: Duration(milliseconds: 700),
+                        child: CircleAvatar(
+                            radius: 18,
+                            backgroundColor: Colors.tealAccent[800],
+                            child: Icon(
+                              Icons.notes_sharp,
+                              color: Colors.white,
+                            )),
+                      ),
+                      AnimatedContainer(
+                        curve: Curves.easeOutQuint,
+                        alignment: aligncircle[th],
+                        duration: Duration(milliseconds: 700),
+                        child: CircleAvatar(
+                          radius: 18,
+                          backgroundColor: Color.fromRGBO(187, 34, 5, 1),
+                          child: Icon(
+                            Icons.text_fields,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      AnimatedContainer(
+                        curve: Curves.easeOutQuint,
+                        alignment: aligncircle[f],
+                        duration: Duration(milliseconds: 700),
+                        child: CircleAvatar(
+                          radius: 18,
+                          backgroundColor: Color.fromRGBO(246, 131, 15, 1),
+                          child: Icon(Icons.lock, color: Colors.white),
+                        ),
+                      )
                     ],
                   ),
                 ),
