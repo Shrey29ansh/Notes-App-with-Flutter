@@ -139,9 +139,7 @@ class _HomePageState extends State<HomePage>
                 return Center(child: CircularProgressIndicator());
               }
               if (snapshot.data.length == 0) {
-                _controller.repeat(
-                  reverse: true,
-                  period: Duration(seconds: 1));
+                _controller.repeat(reverse: true, period: Duration(seconds: 1));
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -165,8 +163,9 @@ class _HomePageState extends State<HomePage>
                   ),
                 );
               } else {
-                _controller.stop();
+                _controller.reset();
                 return GridView.builder(
+                    padding: EdgeInsets.all(20),
                     itemCount: snapshot.data.length,
                     gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2),
@@ -233,7 +232,7 @@ class _HomePageState extends State<HomePage>
                                     child: Stack(
                                       children: [
                                         Positioned(
-                                          top: 1,
+                                          top:-10,
                                           right: 20,
                                           child: Icon(
                                             Icons.vpn_key,
@@ -245,10 +244,14 @@ class _HomePageState extends State<HomePage>
                                         Center(
                                           child: Text(
                                             '${snapshot.data[index]['lockername']}',
+                                            textAlign: TextAlign.center,
                                             style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 25,
                                                 fontWeight: FontWeight.bold),
+                                            overflow: TextOverflow.ellipsis,
+                                            softWrap: true,
+                                            maxLines: 3,
                                           ),
                                         ),
                                       ],

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:chat_app/home.dart';
 import 'package:flutter/services.dart';
 import 'package:chat_app/database_helper.dart';
+import 'package:local_auth/auth_strings.dart';
 import 'package:local_auth/local_auth.dart';
 
 class Locker extends StatefulWidget {
@@ -65,7 +66,15 @@ class _LockerState extends State<Locker> {
     bool isAuthenticated = false;
     try {
       isAuthenticated = await _localAuthentication.authenticateWithBiometrics(
-        localizedReason: "Please authenticate to start using the app",
+        localizedReason: "Please authenticate",
+        androidAuthStrings: AndroidAuthMessages(
+          signInTitle: "Locker is Locked :(",
+          fingerprintRequiredTitle: "Hello",
+          fingerprintHint: "Don't Press back button",
+          fingerprintNotRecognized: "Not Recognised,Try Again!",
+          cancelButton: "Cancel",
+          fingerprintSuccess: "Suuccess"
+        ),
         useErrorDialogs: true,
         stickyAuth: true,
       );
