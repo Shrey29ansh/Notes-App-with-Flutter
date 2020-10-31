@@ -68,13 +68,12 @@ class _LockerState extends State<Locker> {
       isAuthenticated = await _localAuthentication.authenticateWithBiometrics(
         localizedReason: "Please authenticate",
         androidAuthStrings: AndroidAuthMessages(
-          signInTitle: "Locker is Locked :(",
-          fingerprintRequiredTitle: "Hello",
-          fingerprintHint: "Don't Press back button",
-          fingerprintNotRecognized: "Not Recognised,Try Again!",
-          cancelButton: "Cancel",
-          fingerprintSuccess: "Suuccess"
-        ),
+            signInTitle: "Locker is Locked :(",
+            fingerprintRequiredTitle: "Hello",
+            fingerprintHint: "Don't Press back button",
+            fingerprintNotRecognized: "Not Recognised,Try Again!",
+            cancelButton: "Cancel",
+            fingerprintSuccess: "Suuccess"),
         useErrorDialogs: true,
         stickyAuth: true,
       );
@@ -118,7 +117,6 @@ class _LockerState extends State<Locker> {
       showcont = true;
     });
   }
-
 
   Future startTimer() async {
     var _duration = new Duration(milliseconds: 300);
@@ -169,52 +167,58 @@ class _LockerState extends State<Locker> {
                     child: Container(
                       width: MediaQuery.of(context).size.width * .9,
                       height: MediaQuery.of(context).size.width * .9,
-                      child: Card(
-                        elevation: 10,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.lock_open,
-                                    size: 50,
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "Locker: $lockername",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 30),
-                                      overflow: TextOverflow.clip,
-                                      maxLines: 3,
-                                    ),
-                                  ),
-                                ],
+                              Icon(
+                                Icons.lock_open,
+                                size: 50,
+                                color: Colors.white,
                               ),
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    width: 40,
-                                  ),
-                                  Text(
-                                    "Username: $username\nPassword: $password\nComments: $comments",
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15),
-                                  ),
-                                ],
+                              Expanded(
+                                child: Text(
+                                  "Locker: $lockername",textAlign: TextAlign.center,                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 30),
+                                  overflow: TextOverflow.clip,
+                                  maxLines: 3,
+                                ),
                               ),
                             ],
                           ),
-                        ),
+                          Card(
+                            elevation: 10,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 40,
+                                      ),
+                                      Text(
+                                        "Username: $username\nPassword: $password\nComments: $comments",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   )

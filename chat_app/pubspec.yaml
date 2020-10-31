@@ -33,7 +33,7 @@ dependencies:
   path:
   path_provider: ^1.6.21
   google_fonts: ^1.1.1
-
+  http: ^0.12.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

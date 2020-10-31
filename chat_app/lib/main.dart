@@ -37,7 +37,6 @@ class _SplashScreenState extends State<SplashScreen> {
       emptyornot,
       wrong = false,
       check = false;
-  AlignmentDirectional _animatedcontainer = AlignmentDirectional(0.0, 0.7);
   String heading = '', secondarytext = '';
   // ignore: avoid_init_to_null
   var result, exactval, warn = null;
@@ -148,7 +147,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
   opaa() async {
     setState(() {
-      _animatedcontainer = AlignmentDirectional(0.0, -0.7);
       _visible = true;
     });
   }
