@@ -38,12 +38,16 @@ class _LockerState extends State<Locker> {
   double _bottom = -60;
   bool nextscreen = false;
   bool show = false;
+  bool wrong = false, _visible = false;
+
+  bool _submit = false;
   Future _query() async {
     final allRows = await dbHelper.queryAllRows();
     return allRows;
   }
 
-  bool wrong = false, _visible = false;
+  Future editnotes() async {}
+
   // ignore: avoid_init_to_null
   var warn = null;
   Future<bool> _isBiometricAvailable() async {
@@ -69,7 +73,7 @@ class _LockerState extends State<Locker> {
       isAuthenticated = await _localAuthentication.authenticateWithBiometrics(
         localizedReason: "Please authenticate",
         androidAuthStrings: AndroidAuthMessages(
-            signInTitle: "Locker is Locked :(",
+            signInTitle: "Locked :(",
             fingerprintRequiredTitle: "Hello",
             fingerprintHint: "Don't Press back button",
             fingerprintNotRecognized: "Not Recognised,Try Again!",
@@ -188,11 +192,11 @@ class _LockerState extends State<Locker> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             "$lockername",
-                            textAlign: TextAlign.center,
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -205,42 +209,161 @@ class _LockerState extends State<Locker> {
                           ),
                           Icon(
                             Icons.vpn_key,
-                            size: 50,
+                            size: 40,
                             color: Colors.white,
                           ),
                         ],
                       ),
                       Container(
-                        height: MediaQuery.of(context).size.height * 0.2,
                         width: MediaQuery.of(context).size.width * 0.9,
                         child: Card(
                           elevation: 10,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10)),
                           child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Container(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    SizedBox(
-                                      width: 40,
-                                    ),
-                                    Text(
-                                      "Username: $username\nPassword: $password\nComments: $comments",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 17),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Username:",
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 17),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            "$username",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 17,
+                                            ),
+                                            overflow: TextOverflow.clip,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
-                              ],
+                              ),
                             ),
                           ),
                         ),
                       ),
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        child: Card(
+                          elevation: 10,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Container(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Password:",
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 17),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            "$password",
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 17),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        child: Card(
+                          elevation: 10,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Container(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Comments:",
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 17),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            "$comments",
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 17),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        child: AnimatedOpacity(
+                          opacity: _submit ? 1 : 0,
+                          curve: Curves.decelerate,
+                          duration: Duration(milliseconds: 500),
+                          child: Container(
+                            child: RaisedButton(
+                                elevation: 10,
+                                splashColor: Colors.deepOrange,
+                                color: Colors.green,
+                                child: Icon(
+                                  Icons.done,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _bottom = 60;
+                                    _submit = false;
+                                  });
+                                }),
+                          ),
+                        ),
+                      )
                     ],
                   ),
                   AnimatedPositioned(
@@ -254,22 +377,41 @@ class _LockerState extends State<Locker> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           RaisedButton(
-                            color: color,
+                            elevation: 10,
+                            color: Colors.black.withOpacity(0.5),
                             child: Icon(
                               Icons.delete,
                               color: Colors.white,
                             ),
-                            onPressed: null,
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (_) {
+                                    return Container(
+                                      child: DeleteAlert(
+                                        lockername: lockername,
+                                      ),
+                                    );
+                                  });
+                            },
                           ),
                           SizedBox(
                             width: 5,
                           ),
                           RaisedButton(
-                              child: Icon(
-                                Icons.edit,
-                                color: Colors.white,
-                              ),
-                              onPressed: null)
+                            elevation: 10,
+                            color: Colors.black.withOpacity(0.5),
+                            child: Icon(
+                              Icons.edit,
+                              color: Colors.white,
+                            ),
+                            onPressed: () async {
+                              setState(() {
+                                _submit = true;
+                                _bottom = -60;
+                              });
+                            },
+                          ),
                         ],
                       ),
                     ),

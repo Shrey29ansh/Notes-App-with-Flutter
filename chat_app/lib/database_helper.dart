@@ -119,6 +119,11 @@ class CreateNotes {
     return await db.delete(table, where: '$columnName = ?', whereArgs: [name]);
   }
 
+  Future<int> update(Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    String lockername = row[columnName];
+    return await db.update(table, row, where: '$columnName = ?', whereArgs: [lockername]);
+  }
   Future<List<Map<String, dynamic>>> queryAllRows() async {
     Database db = await instance.database;
     return await db.query(table);

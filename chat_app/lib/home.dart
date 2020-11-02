@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:chat_app/locker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -138,25 +137,25 @@ class _HomePageState extends State<HomePage>
                 return Center(child: CircularProgressIndicator());
               }
               if (snapshot.data.length == 0) {
-                _controller.repeat(reverse: true, period: Duration(seconds: 1));
+                _controller.repeat(period: Duration(seconds: 1));
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
                         Icons.sentiment_very_dissatisfied,
-                        color: Colors.grey[900],
-                        size: MediaQuery.of(context).size.width * 0.7,
+                        color: Colors.blue[900],
+                        size: MediaQuery.of(context).size.width * 0.5,
                       ),
                       Text(
                         "Empty Locker",
                         style: GoogleFonts.roboto(
-                            color: Colors.white, fontSize: 17),
+                            color: Colors.grey[900], fontSize: 17),
                       ),
                       Text(
                         "Create Your first Locker",
                         style: GoogleFonts.roboto(
-                            color: Colors.white, fontSize: 17),
+                            color: Colors.grey[900], fontSize: 17),
                       )
                     ],
                   ),
@@ -164,6 +163,8 @@ class _HomePageState extends State<HomePage>
               } else {
                 _controller.reset();
                 return Container(
+                  height: MediaQuery.of(context).size.height,
+                  color: Colors.black,
                   child: SingleChildScrollView(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -755,5 +756,106 @@ class _AlertBoxState extends State<AlertBox> {
         ),
       ),
     );
+  }
+}
+
+class DeleteAlert extends StatefulWidget {
+  final lockername;
+  DeleteAlert({this.lockername});
+  @override
+  _DeleteAlertState createState() => _DeleteAlertState(lockername: lockername);
+}
+
+class _DeleteAlertState extends State<DeleteAlert> {
+  final lockername;
+  _DeleteAlertState({this.lockername});
+  double _showalert = 0;
+  startTImer() {
+    var duration = Duration(microseconds: 100);
+    return new Timer(duration, () {
+      setState(() {
+        _showalert = 30;
+      });
+    });
+  }
+
+  Future deleteLocker() async {
+    try {
+      final dbHelper = CreateNotes.instance;
+      final result = await dbHelper.delete(lockername);
+      final allRows = await dbHelper.queryAllRows();
+      _streamController.add(allRows);
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
+      return result;
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  void initState() {
+    startTImer();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      AnimatedPositioned(
+        bottom: _showalert,
+        curve: Curves.ease,
+        duration: Duration(milliseconds: 500),
+        child: Center(
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            child: AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              title: Text("Are you sure you want to delete this locker?"),
+              content: Text(
+                "There is no backup!",
+                style: TextStyle(color: Colors.grey[600]),
+              ),
+              actionsPadding: EdgeInsets.all(10),
+              actions: [
+                RaisedButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  elevation: 5,
+                  child: Text(
+                    'Yes',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  color: Colors.grey[900],
+                  onPressed: () async {
+                    await deleteLocker();
+                  },
+                ),
+                RaisedButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  elevation: 5,
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  color: Colors.grey[900],
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ]);
   }
 }
