@@ -193,7 +193,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     startcircleTime();
-    startTime();
+    //startTime();
   }
 
   @override
@@ -203,7 +203,7 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          color: Colors.black,
+          color: Colors.amber,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -212,32 +212,79 @@ class _SplashScreenState extends State<SplashScreen> {
                 duration: Duration(milliseconds: 500),
                 curve: Curves.easeIn,
                 child: Container(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.edit,
-                        color: Colors.white,
-                        size: 40,
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  child: Card(
+                    elevation: 10,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    color: Colors.grey[900].withOpacity(0.5),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    "Note",
+                                    style: GoogleFonts.montserratAlternates(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      fontSize: 30,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    softWrap: true,
+                                    maxLines: 3,
+                                  ),
+                                  Text(
+                                    "Share",
+                                    style: GoogleFonts.montserratAlternates(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      fontSize: 30,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    softWrap: true,
+                                    maxLines: 3,
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                "Keep your Passwords handy",
+                                style: GoogleFonts.montserratAlternates(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                softWrap: true,
+                                maxLines: 3,
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Card(
+                            elevation: 10,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30)),
+                            child: Image(
+                              height: 
+                              60,
+                              image: AssetImage('images/appicon/icon4.png'),
+                            ),
+                          ),
+                        ],
                       ),
-                      Text("Note",
-                          style: GoogleFonts.montserratAlternates(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: 30,
-                          )),
-                      Text(
-                        "Share",
-                        style: GoogleFonts.montserratAlternates(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: 30),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
               Container(
+                
                 height: MediaQuery.of(context).size.width * 0.37,
                 width: MediaQuery.of(context).size.width * 0.35,
                 child: Padding(
@@ -249,10 +296,11 @@ class _SplashScreenState extends State<SplashScreen> {
                         alignment: aligncircle[o],
                         duration: Duration(milliseconds: 700),
                         child: CircleAvatar(
-                            radius: 18,
-                            backgroundColor: Colors.white,
+                            radius: 22,
+                            backgroundColor: Color.fromRGBO(114, 162, 192, 1),
                             child: Icon(
                               Icons.vpn_key,
+                              color: Colors.white,
                             )),
                       ),
                       AnimatedContainer(
@@ -260,8 +308,8 @@ class _SplashScreenState extends State<SplashScreen> {
                         alignment: aligncircle[t],
                         duration: Duration(milliseconds: 700),
                         child: CircleAvatar(
-                            radius: 18,
-                            backgroundColor: Colors.tealAccent[800],
+                            radius: 22,
+                            backgroundColor:    Color.fromRGBO(0, 116, 63, 1),
                             child: Icon(
                               Icons.notes_sharp,
                               color: Colors.white,
@@ -272,8 +320,8 @@ class _SplashScreenState extends State<SplashScreen> {
                         alignment: aligncircle[th],
                         duration: Duration(milliseconds: 700),
                         child: CircleAvatar(
-                          radius: 18,
-                          backgroundColor: Color.fromRGBO(187, 34, 5, 1),
+                          radius: 22,
+                          backgroundColor: Color.fromRGBO(25, 46, 91, 1),
                           child: Icon(
                             Icons.text_fields,
                             color: Colors.white,
@@ -285,8 +333,8 @@ class _SplashScreenState extends State<SplashScreen> {
                         alignment: aligncircle[f],
                         duration: Duration(milliseconds: 700),
                         child: CircleAvatar(
-                          radius: 18,
-                          backgroundColor: Color.fromRGBO(246, 131, 15, 1),
+                          radius: 22,
+                          backgroundColor: Color.fromRGBO(29, 101, 166, 1),
                           child: Icon(Icons.lock, color: Colors.white),
                         ),
                       )
