@@ -25,6 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Alignment.bottomCenter,
     Alignment.centerLeft
   ];
+  String loading = '';
   List alignline = [
     Alignment.topLeft,
     Alignment.topRight,
@@ -140,6 +141,10 @@ class _SplashScreenState extends State<SplashScreen> {
           th = (th + 1) % 4;
           f = (f + 1) % 4;
           lined = (lined + 1) % 2;
+          loading.length == 3
+              ? loading = ''
+              : loading = loading.padRight(timer.tick % 4, '.');
+          print(loading);
         });
       }
     });
@@ -193,7 +198,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     startcircleTime();
-    //startTime();
+    startTime();
   }
 
   @override
@@ -203,56 +208,78 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          color: Colors.amber,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          color: Colors.black,
+          child: Stack(
             children: [
-              AnimatedOpacity(
-                opacity: _cont ? 1 : 0,
-                duration: Duration(milliseconds: 500),
-                curve: Curves.easeIn,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  child: Card(
-                    elevation: 10,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    color: Colors.grey[900].withOpacity(0.5),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    "Note",
-                                    style: GoogleFonts.montserratAlternates(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      fontSize: 30,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    softWrap: true,
-                                    maxLines: 3,
-                                  ),
-                                  Text(
-                                    "Share",
-                                    style: GoogleFonts.montserratAlternates(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      fontSize: 30,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    softWrap: true,
-                                    maxLines: 3,
-                                  ),
-                                ],
+              Align(
+                  alignment: Alignment.bottomCenter,
+                  child: AnimatedOpacity(
+                    opacity: _cont ? 1 : 0,
+                    duration: Duration(milliseconds: 900),
+                    curve: Curves.easeIn,
+                    child: Container(
+                      margin: EdgeInsets.fromLTRB(0, 0, 0, 60),
+                      height: MediaQuery.of(context).size.width * 0.4,
+                      width: MediaQuery.of(context).size.width * 0.37,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Stack(
+                          children: [
+                            AnimatedContainer(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                              curve: Curves.easeInQuad,
+                              alignment: aligncircle[o],
+                              duration: Duration(milliseconds: 500),
+                              child: CircleAvatar(
+                                  radius: 21,
+                                  backgroundColor: Colors.white,
+                                  child: Icon(
+                                    Icons.vpn_key,
+                                  )),
+                            ),
+                            AnimatedContainer(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                              curve: Curves.easeInQuad,
+                              alignment: aligncircle[t],
+                              duration: Duration(milliseconds: 500),
+                              child: CircleAvatar(
+                                  radius: 21,
+                                  backgroundColor: Colors.tealAccent[800],
+                                  child: Icon(
+                                    Icons.notes_sharp,
+                                    color: Colors.white,
+                                  )),
+                            ),
+                            AnimatedContainer(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                              curve: Curves.easeInQuad,
+                              alignment: aligncircle[th],
+                              duration: Duration(milliseconds: 500),
+                              child: CircleAvatar(
+                                radius: 21,
+                                backgroundColor: Color.fromRGBO(187, 34, 5, 1),
+                                child: Icon(
+                                  Icons.text_fields,
+                                  color: Colors.white,
+                                ),
                               ),
-                              Text(
-                                "Keep your Passwords handy",
+                            ),
+                            AnimatedContainer(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                              curve: Curves.easeInQuad,
+                              alignment: aligncircle[f],
+                              duration: Duration(milliseconds: 500),
+                              child: CircleAvatar(
+                                radius: 21,
+                                backgroundColor:
+                                    Color.fromRGBO(246, 131, 15, 1),
+                                child: Icon(Icons.lock, color: Colors.white),
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Text(
+                                "Loading Lockers$loading",
                                 style: GoogleFonts.montserratAlternates(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
@@ -262,83 +289,83 @@ class _SplashScreenState extends State<SplashScreen> {
                                 softWrap: true,
                                 maxLines: 3,
                               ),
-                            ],
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Card(
-                            elevation: 10,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30)),
-                            child: Image(
-                              height: 
-                              60,
-                              image: AssetImage('images/appicon/icon4.png'),
-                            ),
-                          ),
-                        ],
+                            )
+                          ],
+                        ),
                       ),
                     ),
+                  )),
+              /* Positioned(
+                  child: AnimatedOpacity(
+                opacity: _cont ? 1 : 0,
+                duration: Duration(milliseconds: 500),
+                curve: Curves.easeIn,
+                child: Container(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        image: AssetImage('images/appicon/icon4.png'),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              Container(
-                
-                height: MediaQuery.of(context).size.width * 0.37,
-                width: MediaQuery.of(context).size.width * 0.35,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Stack(
-                    children: [
-                      AnimatedContainer(
-                        curve: Curves.easeOutQuint,
-                        alignment: aligncircle[o],
-                        duration: Duration(milliseconds: 700),
-                        child: CircleAvatar(
-                            radius: 22,
-                            backgroundColor: Color.fromRGBO(114, 162, 192, 1),
-                            child: Icon(
-                              Icons.vpn_key,
-                              color: Colors.white,
-                            )),
-                      ),
-                      AnimatedContainer(
-                        curve: Curves.easeOutQuint,
-                        alignment: aligncircle[t],
-                        duration: Duration(milliseconds: 700),
-                        child: CircleAvatar(
-                            radius: 22,
-                            backgroundColor:    Color.fromRGBO(0, 116, 63, 1),
-                            child: Icon(
-                              Icons.notes_sharp,
-                              color: Colors.white,
-                            )),
-                      ),
-                      AnimatedContainer(
-                        curve: Curves.easeOutQuint,
-                        alignment: aligncircle[th],
-                        duration: Duration(milliseconds: 700),
-                        child: CircleAvatar(
-                          radius: 22,
-                          backgroundColor: Color.fromRGBO(25, 46, 91, 1),
-                          child: Icon(
-                            Icons.text_fields,
+              )), */
+              Center(
+                child: AnimatedOpacity(
+                  opacity: _cont ? 1 : 0,
+                  duration: Duration(milliseconds: 500),
+                  curve: Curves.easeIn,
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          image: AssetImage('images/appicon/icon4.png'),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Note",
+                              style: GoogleFonts.montserratAlternates(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                fontSize: 30,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: true,
+                              maxLines: 3,
+                            ),
+                            Text(
+                              "Share",
+                              style: GoogleFonts.montserratAlternates(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                fontSize: 30,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: true,
+                              maxLines: 3,
+                            ),
+                          ],
+                        ),
+                        Text(
+                          "Keep your Passwords handy",
+                          style: GoogleFonts.montserratAlternates(
+                            fontWeight: FontWeight.bold,
                             color: Colors.white,
+                            fontSize: 11,
                           ),
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: true,
+                          maxLines: 3,
                         ),
-                      ),
-                      AnimatedContainer(
-                        curve: Curves.easeOutQuint,
-                        alignment: aligncircle[f],
-                        duration: Duration(milliseconds: 700),
-                        child: CircleAvatar(
-                          radius: 22,
-                          backgroundColor: Color.fromRGBO(29, 101, 166, 1),
-                          child: Icon(Icons.lock, color: Colors.white),
-                        ),
-                      )
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
