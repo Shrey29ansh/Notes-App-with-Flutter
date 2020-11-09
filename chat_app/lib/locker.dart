@@ -8,6 +8,8 @@ import 'package:chat_app/database_helper.dart';
 import 'package:local_auth/auth_strings.dart';
 import 'package:local_auth/local_auth.dart';
 
+import 'notes_tab.dart';
+
 class Locker extends StatefulWidget {
   final lockername, password, username, comments, color;
   Locker(

@@ -123,7 +123,27 @@ class _SplashScreenState extends State<SplashScreen> {
     return new Timer(_duration, opaa);
   }
 
-  var o = 0, t = 1, th = 2, f = 3, lined = 0;
+  List customicon = [
+    Icons.lock,
+    Icons.vpn_key_sharp,
+    Icons.account_balance_wallet,
+    Icons.text_fields,
+    Icons.notes
+  ];
+  List colors = [
+    Color.fromRGBO(25, 46, 91, 1),
+    Color.fromRGBO(29, 101, 166, 1),
+    Color.fromRGBO(114, 162, 192, 1),
+    Color.fromRGBO(0, 116, 63, 1),
+    Color.fromRGBO(242, 161, 4, 1),
+  ];
+  BorderRadiusGeometry _borderRadius = BorderRadius.circular(8);
+
+  double _width = 55;
+  var xf = 0;
+  double bottomheight = 90;
+  bool motion = false;
+  bool change = false;
   startcircleTime() async {
     var _duration = new Duration(seconds: 1);
     return new Timer.periodic(_duration, (timer) {
@@ -135,16 +155,24 @@ class _SplashScreenState extends State<SplashScreen> {
             _cont = true;
           });
         }
+        int next(int min, int max) => min + random.nextInt(max - min);
         setState(() {
-          o = (o + 1) % 4;
-          t = (t + 1) % 4;
-          th = (th + 1) % 4;
-          f = (f + 1) % 4;
-          lined = (lined + 1) % 2;
+          _width = next(55, 75).toDouble();
+          _borderRadius = BorderRadius.circular(random.nextInt(5).toDouble());
+          if (timer.tick % 2 == 0) {
+            xf = xf % 4;
+            change = true;
+            xf++;
+            motion = false;
+            bottomheight = bottomheight - 30;
+          } else {
+            bottomheight = bottomheight + 30;
+            motion = true;
+            change = false;
+          }
           loading.length == 3
               ? loading = ''
               : loading = loading.padRight(timer.tick % 4, '.');
-          print(loading);
         });
       }
     });
@@ -211,111 +239,43 @@ class _SplashScreenState extends State<SplashScreen> {
           color: Colors.black,
           child: Stack(
             children: [
-              Align(
-                  alignment: Alignment.bottomCenter,
-                  child: AnimatedOpacity(
-                    opacity: _cont ? 1 : 0,
-                    duration: Duration(milliseconds: 900),
-                    curve: Curves.easeIn,
-                    child: Container(
-                      margin: EdgeInsets.fromLTRB(0, 0, 0, 60),
-                      height: MediaQuery.of(context).size.width * 0.4,
-                      width: MediaQuery.of(context).size.width * 0.37,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Stack(
-                          children: [
-                            AnimatedContainer(
-                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                              curve: Curves.easeInQuad,
-                              alignment: aligncircle[o],
-                              duration: Duration(milliseconds: 500),
-                              child: CircleAvatar(
-                                  radius: 21,
-                                  backgroundColor: Colors.white,
-                                  child: Icon(
-                                    Icons.vpn_key,
-                                  )),
-                            ),
-                            AnimatedContainer(
-                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                              curve: Curves.easeInQuad,
-                              alignment: aligncircle[t],
-                              duration: Duration(milliseconds: 500),
-                              child: CircleAvatar(
-                                  radius: 21,
-                                  backgroundColor: Colors.tealAccent[800],
-                                  child: Icon(
-                                    Icons.notes_sharp,
-                                    color: Colors.white,
-                                  )),
-                            ),
-                            AnimatedContainer(
-                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                              curve: Curves.easeInQuad,
-                              alignment: aligncircle[th],
-                              duration: Duration(milliseconds: 500),
-                              child: CircleAvatar(
-                                radius: 21,
-                                backgroundColor: Color.fromRGBO(187, 34, 5, 1),
-                                child: Icon(
-                                  Icons.text_fields,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                            AnimatedContainer(
-                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                              curve: Curves.easeInQuad,
-                              alignment: aligncircle[f],
-                              duration: Duration(milliseconds: 500),
-                              child: CircleAvatar(
-                                radius: 21,
-                                backgroundColor:
-                                    Color.fromRGBO(246, 131, 15, 1),
-                                child: Icon(Icons.lock, color: Colors.white),
-                              ),
-                            ),
-                            Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Text(
-                                "Loading Lockers$loading",
-                                style: GoogleFonts.montserratAlternates(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontSize: 11,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                                softWrap: true,
-                                maxLines: 3,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
+              AnimatedPositioned(
+                  bottom: bottomheight,
+                  left: MediaQuery.of(context).size.width * 0.48,
+                  right: MediaQuery.of(context).size.width * 0.48,
+                  child: AnimatedContainer(
+                    width: _width,
+                    height: _width,
+                    decoration: BoxDecoration(
+                      color: colors[xf],
+                      borderRadius: _borderRadius,
                     ),
-                  )),
-              /* Positioned(
-                  child: AnimatedOpacity(
-                opacity: _cont ? 1 : 0,
-                duration: Duration(milliseconds: 500),
-                curve: Curves.easeIn,
+                    // Define how long the animation should take.
+                    duration: Duration(milliseconds: 1000),
+                    // Provide an optional curve to make the animation feel smoother.
+                    curve: Curves.ease,
+                  ),
+                  curve: motion ? Curves.easeInOut : Curves.fastOutSlowIn,
+                  duration: Duration(milliseconds: 900)),
+              Align(
+                alignment: Alignment.bottomCenter,
                 child: Container(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        image: AssetImage('images/appicon/icon4.png'),
-                      ),
-                    ],
+                  margin: EdgeInsets.fromLTRB(0, 0, 0, 60),
+                  child: CircleAvatar(
+                    backgroundColor: colors[xf],
+                    child: AnimatedOpacity(
+                      duration: Duration(milliseconds: 100),
+                      curve: Curves.bounceIn,
+                      opacity: change ? 1 : 0,
+                      child: Icon(customicon[xf], color: Colors.white, size: 30),
+                    ),
                   ),
                 ),
-              )), */
+              ),
               Center(
                 child: AnimatedOpacity(
                   opacity: _cont ? 1 : 0,
-                  duration: Duration(milliseconds: 500),
+                  duration: Duration(milliseconds: 200),
                   curve: Curves.easeIn,
                   child: Container(
                     width: MediaQuery.of(context).size.width * 0.9,
@@ -323,10 +283,25 @@ class _SplashScreenState extends State<SplashScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image(
-                          width: MediaQuery.of(context).size.width * 0.5,
+                          width: MediaQuery.of(context).size.width * 0.25,
                           image: AssetImage('images/appicon/icon4.png'),
                         ),
-                        Row(
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          "Loading Lockers$loading",
+                          style: GoogleFonts.montserratAlternates(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: 11,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: true,
+                          maxLines: 3,
+                        ),
+
+                        /* Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
@@ -363,7 +338,7 @@ class _SplashScreenState extends State<SplashScreen> {
                           overflow: TextOverflow.ellipsis,
                           softWrap: true,
                           maxLines: 3,
-                        ),
+                        ), */
                       ],
                     ),
                   ),
