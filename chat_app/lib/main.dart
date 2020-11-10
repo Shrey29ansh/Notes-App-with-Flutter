@@ -139,8 +139,9 @@ class _SplashScreenState extends State<SplashScreen> {
   ];
   BorderRadiusGeometry _borderRadius = BorderRadius.circular(8);
 
-  double _width = 55;
-  var xf = 0;
+  // ignore: non_constant_identifier_names
+  double width_container = 0;
+  var xf = 1, temp = -0.4;
   double bottomheight = 90;
   bool motion = false;
   bool change = false;
@@ -152,24 +153,15 @@ class _SplashScreenState extends State<SplashScreen> {
       } else {
         if (timer.tick == 1) {
           setState(() {
+            xf = 0;
             _cont = true;
           });
         }
-        int next(int min, int max) => min + random.nextInt(max - min);
+        xf++;
         setState(() {
-          _width = next(55, 75).toDouble();
-          _borderRadius = BorderRadius.circular(random.nextInt(5).toDouble());
-          if (timer.tick % 2 == 0) {
-            xf = xf % 4;
-            change = true;
-            xf++;
-            motion = false;
-            bottomheight = bottomheight - 30;
-          } else {
-            bottomheight = bottomheight + 30;
-            motion = true;
-            change = false;
-          }
+          width_container = width_container - temp;
+          temp = -temp;
+          xf = xf % 5;
           loading.length == 3
               ? loading = ''
               : loading = loading.padRight(timer.tick % 4, '.');
@@ -191,7 +183,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (nextscreen) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
+          MyCustomRoute(
             builder: (context) => HomePage(),
           ),
         );
@@ -236,39 +228,55 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          color: Colors.black,
+          color: Colors.white,
           child: Stack(
             children: [
-              AnimatedPositioned(
-                  bottom: bottomheight,
-                  left: MediaQuery.of(context).size.width * 0.48,
-                  right: MediaQuery.of(context).size.width * 0.48,
-                  child: AnimatedContainer(
-                    width: _width,
-                    height: _width,
-                    decoration: BoxDecoration(
-                      color: colors[xf],
-                      borderRadius: _borderRadius,
-                    ),
-                    // Define how long the animation should take.
-                    duration: Duration(milliseconds: 1000),
-                    // Provide an optional curve to make the animation feel smoother.
-                    curve: Curves.ease,
-                  ),
-                  curve: motion ? Curves.easeInOut : Curves.fastOutSlowIn,
-                  duration: Duration(milliseconds: 900)),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
+                  height: MediaQuery.of(context).size.height,
                   margin: EdgeInsets.fromLTRB(0, 0, 0, 60),
-                  child: CircleAvatar(
-                    backgroundColor: colors[xf],
-                    child: AnimatedOpacity(
-                      duration: Duration(milliseconds: 100),
-                      curve: Curves.bounceIn,
-                      opacity: change ? 1 : 0,
-                      child: Icon(customicon[xf], color: Colors.white, size: 30),
-                    ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Container(
+                          //margin: EdgeInsets.fromLTRB(0, 0, 0, 60),
+                          child: AnimatedSwitcher(
+                            transitionBuilder: (child, animation) {
+                              return ScaleTransition(
+                                child: child,
+                                scale: animation,
+                              );
+                            },
+                            duration: Duration(milliseconds: 600),
+                            child: Container(
+                              key: UniqueKey(),
+                              child: CircleAvatar(
+                                backgroundColor: colors[xf],
+                                child: Icon(customicon[xf],
+                                    color: Colors.white, size: 30),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 2,
+                      ),
+                      Text(
+                        "Loading Lockers$loading",
+                        style: GoogleFonts.montserratAlternates(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 11,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: true,
+                        maxLines: 3,
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -289,18 +297,19 @@ class _SplashScreenState extends State<SplashScreen> {
                         SizedBox(
                           height: 10,
                         ),
-                        Text(
-                          "Loading Lockers$loading",
-                          style: GoogleFonts.montserratAlternates(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: 11,
+                        AnimatedContainer(
+                          width: MediaQuery.of(context).size.width *
+                              width_container,
+                          height:2.5,
+                          decoration: BoxDecoration(
+                            color: colors[xf],
+                            borderRadius: _borderRadius,
                           ),
-                          overflow: TextOverflow.ellipsis,
-                          softWrap: true,
-                          maxLines: 3,
+                          // Define how long the animation should take.
+                          duration: Duration(milliseconds: 1000),
+                          // Provide an optional curve to make the animation feel smoother.
+                          curve: Curves.ease,
                         ),
-
                         /* Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -472,5 +481,19 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       ),
     );
+  }
+}
+class MyCustomRoute<T> extends MaterialPageRoute<T> {
+  MyCustomRoute({ WidgetBuilder builder, RouteSettings settings })
+      : super(builder: builder, settings: settings);
+
+  @override
+  Widget buildTransitions(BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      Widget child) {
+    // Fades between routes. (If you don't want any animation,
+    // just return child.)
+    return new FadeTransition(opacity: animation, child: child);
   }
 }
