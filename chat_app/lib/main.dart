@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:chat_app/home.dart';
 import 'package:flutter/services.dart';
@@ -18,110 +17,23 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   final dbHelper = mainDB.instance;
+  final LocalAuthentication _localAuthentication = LocalAuthentication();
+  final number = TextEditingController();
   List directioncircle;
+
   List aligncircle = [
     Alignment.topCenter,
     Alignment.centerRight,
     Alignment.bottomCenter,
     Alignment.centerLeft
   ];
+
   String loading = '';
+
   List alignline = [
     Alignment.topLeft,
     Alignment.topRight,
   ];
-  Random random = new Random();
-  final number = TextEditingController();
-  bool _visible = false,
-      nobiometric = false,
-      nextscreen = false,
-      emptyornot,
-      wrong = false,
-      check = false;
-  String heading = '', secondarytext = '';
-  // ignore: avoid_init_to_null
-  var result, exactval, warn = null;
-  final LocalAuthentication _localAuthentication = LocalAuthentication();
-  bool _cont = false;
-  Future _query() async {
-    final allRows = await dbHelper.queryAllRows();
-    return allRows;
-  }
-
-  void _insert(String passcode) async {
-    // row to insert
-    Map<String, dynamic> row = {
-      mainDB.columnName: '$passcode',
-    };
-    final id = await dbHelper.insert(row);
-    print('inserted row id: $id');
-  }
-
-  Future<bool> _isBiometricAvailable() async {
-    bool isAvailable = false;
-    try {
-      isAvailable = await _localAuthentication.canCheckBiometrics;
-    } on PlatformException catch (e) {
-      print(e);
-    }
-
-    if (!mounted) return isAvailable;
-
-    isAvailable
-        ? print('Biometric is available!')
-        : print('Biometric is unavailable.');
-
-    return isAvailable;
-  }
-
-  Future<void> _authenticateUser() async {
-    bool isAuthenticated = false;
-    try {
-      isAuthenticated = await _localAuthentication.authenticateWithBiometrics(
-        localizedReason: "Please authenticate to start using the app",
-        useErrorDialogs: true,
-        stickyAuth: true,
-      );
-    } on PlatformException catch (e) {
-      print(e);
-    }
-
-    if (!mounted) return;
-
-    isAuthenticated
-        ? print('User is authenticated!')
-        : print('User is not authenticated.');
-
-    if (isAuthenticated) {
-      setState(() {
-        nextscreen = true;
-      });
-    }
-  }
-
-  Future<void> _getListOfBiometricTypes() async {
-    List<BiometricType> listOfBiometrics;
-    try {
-      listOfBiometrics = await _localAuthentication.getAvailableBiometrics();
-    } on PlatformException catch (e) {
-      print(e);
-    }
-
-    if (!mounted) return;
-
-    print(listOfBiometrics);
-  }
-
-  startTime() async {
-    setState(() {});
-    var _duration = new Duration(seconds: 5);
-    return new Timer(_duration, navigationPage);
-  }
-
-  Future startTimer() async {
-    var _duration = new Duration(milliseconds: 300);
-    return new Timer(_duration, opaa);
-  }
 
   List customicon = [
     Icons.lock,
@@ -130,6 +42,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Icons.text_fields,
     Icons.notes
   ];
+
   List colors = [
     Color.fromRGBO(25, 46, 91, 1),
     Color.fromRGBO(29, 101, 166, 1),
@@ -140,79 +53,19 @@ class _SplashScreenState extends State<SplashScreen> {
   BorderRadiusGeometry _borderRadius = BorderRadius.circular(8);
 
   // ignore: non_constant_identifier_names
-  double width_container = 0;
-  var xf = 1, temp = -0.4;
-  double bottomheight = 90;
-  bool motion = false;
-  bool change = false;
-  startcircleTime() async {
-    var _duration = new Duration(seconds: 1);
-    return new Timer.periodic(_duration, (timer) {
-      if (nextscreen) {
-        timer.cancel();
-      } else {
-        if (timer.tick == 1) {
-          setState(() {
-            xf = 0;
-            _cont = true;
-          });
-        }
-        xf++;
-        setState(() {
-          width_container = width_container - temp;
-          temp = -temp;
-          xf = xf % 5;
-          loading.length == 3
-              ? loading = ''
-              : loading = loading.padRight(timer.tick % 4, '.');
-        });
-      }
-    });
-  }
+  double width_container = 0, bottomheight = 90;
+  var xf = 1, temp = -0.4, result, exactval, warn = null;
 
-  opaa() async {
-    setState(() {
-      _visible = true;
-    });
-  }
-
-  navigationPage() async {
-    if (await _isBiometricAvailable()) {
-      await _getListOfBiometricTypes();
-      await _authenticateUser();
-      if (nextscreen) {
-        Navigator.pushReplacement(
-          context,
-          MyCustomRoute(
-            builder: (context) => HomePage(),
-          ),
-        );
-      }
-    } else {
-      print("hello");
-      var value;
-      value = await _query();
-      if (value.isEmpty) {
-        setState(() {
-          exactval = null;
-          heading = 'Welcome to the App';
-          secondarytext = 'Set an app passcode to continue!';
-          print("done");
-          check = true;
-        });
-      } else {
-        setState(() {
-          exactval = value[0]['code'];
-          heading = 'Welcome back';
-          secondarytext = 'Enter passcode';
-          print("done");
-          check = true;
-        });
-      }
-      startTimer();
-      //Navigator.of(context).pushReplacement(_createRoute());
-    }
-  }
+  bool _visible = false,
+      nobiometric = false,
+      nextscreen = false,
+      emptyornot,
+      wrong = false,
+      check = false,
+      motion = false,
+      change = false,
+      _cont = false;
+  String heading = '', secondarytext = '';
 
   @override
   void initState() {
@@ -300,7 +153,7 @@ class _SplashScreenState extends State<SplashScreen> {
                         AnimatedContainer(
                           width: MediaQuery.of(context).size.width *
                               width_container,
-                          height:2.5,
+                          height: 2.5,
                           decoration: BoxDecoration(
                             color: colors[xf],
                             borderRadius: _borderRadius,
@@ -482,18 +335,153 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
   }
-}
-class MyCustomRoute<T> extends MaterialPageRoute<T> {
-  MyCustomRoute({ WidgetBuilder builder, RouteSettings settings })
-      : super(builder: builder, settings: settings);
 
-  @override
-  Widget buildTransitions(BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child) {
-    // Fades between routes. (If you don't want any animation,
-    // just return child.)
-    return new FadeTransition(opacity: animation, child: child);
+  void _insert(String passcode) async {
+    // row to insert
+    Map<String, dynamic> row = {
+      mainDB.columnName: '$passcode',
+    };
+    final id = await dbHelper.insert(row);
+    print('inserted row id: $id');
+  }
+
+  Future<bool> _isBiometricAvailable() async {
+    bool isAvailable = false;
+    try {
+      isAvailable = await _localAuthentication.canCheckBiometrics;
+    } on PlatformException catch (e) {
+      print(e);
+    }
+
+    if (!mounted) return isAvailable;
+
+    isAvailable
+        ? print('Biometric is available!')
+        : print('Biometric is unavailable.');
+
+    return isAvailable;
+  }
+
+  Future _query() async {
+    final allRows = await dbHelper.queryAllRows();
+    return allRows;
+  }
+
+  Future<void> _authenticateUser() async {
+    bool isAuthenticated = false;
+    try {
+      isAuthenticated = await _localAuthentication.authenticateWithBiometrics(
+        localizedReason: "Please authenticate to start using the app",
+        useErrorDialogs: true,
+        stickyAuth: true,
+      );
+    } on PlatformException catch (e) {
+      print(e);
+    }
+
+    if (!mounted) return;
+
+    isAuthenticated
+        ? print('User is authenticated!')
+        : print('User is not authenticated.');
+
+    if (isAuthenticated) {
+      setState(() {
+        nextscreen = true;
+      });
+    }
+  }
+
+  Future<void> _getListOfBiometricTypes() async {
+    List<BiometricType> listOfBiometrics;
+    try {
+      listOfBiometrics = await _localAuthentication.getAvailableBiometrics();
+    } on PlatformException catch (e) {
+      print(e);
+    }
+
+    if (!mounted) return;
+
+    print(listOfBiometrics);
+  }
+
+  startTime() async {
+    setState(() {});
+    var _duration = new Duration(seconds: 5);
+    return new Timer(_duration, navigationPage);
+  }
+
+  Future startTimer() async {
+    var _duration = new Duration(milliseconds: 300);
+    return new Timer(_duration, opaa);
+  }
+
+  startcircleTime() async {
+    var _duration = new Duration(seconds: 1);
+    return new Timer.periodic(_duration, (timer) {
+      if (nextscreen) {
+        timer.cancel();
+      } else {
+        if (timer.tick == 1) {
+          setState(() {
+            xf = 0;
+            _cont = true;
+          });
+        }
+        xf++;
+        setState(() {
+          width_container = width_container - temp;
+          temp = -temp;
+          xf = xf % 5;
+          loading.length == 3
+              ? loading = ''
+              : loading = loading.padRight(timer.tick % 4, '.');
+        });
+      }
+    });
+  }
+
+  opaa() async {
+    setState(() {
+      _visible = true;
+    });
+  }
+
+  navigationPage() async {
+    if (await _isBiometricAvailable()) {
+      await _getListOfBiometricTypes();
+      await _authenticateUser();
+      if (nextscreen) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(),
+          ),
+        );
+      }
+    } else {
+      print("hello");
+      var value;
+      value = await _query();
+      if (value.isEmpty) {
+        setState(() {
+          exactval = null;
+          heading = 'Welcome to the App';
+          secondarytext = 'Set an app passcode to continue!';
+          print("done");
+          check = true;
+        });
+      } else {
+        setState(() {
+          exactval = value[0]['code'];
+          heading = 'Welcome back';
+          secondarytext = 'Enter passcode';
+          print("done");
+          check = true;
+        });
+      }
+      startTimer();
+      //Navigator.of(context).pushReplacement(_createRoute());
+    }
   }
 }

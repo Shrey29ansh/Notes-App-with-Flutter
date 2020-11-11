@@ -10,9 +10,8 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin {
-  AnimationController _controller;
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+  int tabnumber = 0;
   List colors = [
     Color.fromRGBO(25, 46, 91, 1),
     Color.fromRGBO(29, 101, 166, 1),
@@ -20,43 +19,50 @@ class _HomePageState extends State<HomePage>
     Color.fromRGBO(0, 116, 63, 1),
     Color.fromRGBO(242, 161, 4, 1),
   ];
-  @override
-  void initState() {
-    _controller = AnimationController(
-      vsync: this, // the SingleTickerProviderStateMixin
-      duration:
-          Duration(seconds: 1), // how long should the animation take to finish
-    );
-    super.initState();
+  TabController _tabController;
+  void _handletab() {
+    setState(() {
+      tabnumber = _tabController.index;
+    });
   }
 
   @override
-  dispose() {
-    _controller.dispose();
-    super.dispose();
+  void initState() {
+    _tabController = TabController(vsync: this, length: 2);
+    _tabController.animation.addListener(_handletab);
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
+      initialIndex: 0,
       length: 2,
       child: Scaffold(
           appBar: AppBar(
-            bottom: TabBar(
-              tabs: [
-                Tab(
-                  icon: Icon(Icons.notes),
-                
-                  text: "Lockers",
+            bottom: PreferredSize(
+              preferredSize: new Size(MediaQuery.of(context).size.width,
+                  MediaQuery.of(context).size.height * 0.06),
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.5,
+                child: TabBar(
+                  controller: _tabController,
+                  tabs: [
+                    Tab(
+                      text: "Lockers",
+                    ),
+                    Tab(
+                      text: "Task",
+                    ),
+                  ],
+                  indicatorSize: TabBarIndicatorSize.label,
+                  indicatorWeight: 1,
+                  indicatorColor: colors[2],
+                  indicatorPadding: EdgeInsets.all(10),
+                  labelColor: Colors.white,
+                  unselectedLabelColor: Colors.grey[700],
                 ),
-                Tab(
-                  text: "Task",
-                  icon: Icon(Icons.timer),
-                ),
-              ],
-              indicatorSize: TabBarIndicatorSize.tab,
-              indicatorWeight: 5,
-              indicatorColor: colors[2],
+              ),
             ),
             actions: [
               IconButton(
@@ -95,12 +101,34 @@ class _HomePageState extends State<HomePage>
           ),
           floatingActionButton: FloatingActionButton(
             focusColor: Colors.white,
-            child: AnimatedIcon(
-              icon: AnimatedIcons
-                  .add_event, // one of the available animated icons
-              progress: _controller, // this is our AnimationController
-              color: Colors.white,
-            ),
+            child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (child, animation) {
+                  return ScaleTransition(
+                    child: child,
+                    scale: animation,
+                  );
+                },
+                child: Container(
+                  key: UniqueKey(),
+                  child: tabnumber == 0
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.note_add_outlined,
+                            color: Colors.white,
+                          ),
+                          iconSize: 30,
+                          onPressed: null,
+                        )
+                      : IconButton(
+                          icon: Icon(
+                            Icons.add_alert,
+                            color: Colors.white,
+                          ),
+                          iconSize: 30,
+                          onPressed: null,
+                        ),
+                )),
             onPressed: () {
               showDialog(
                   context: context,
@@ -113,9 +141,12 @@ class _HomePageState extends State<HomePage>
             hoverColor: Colors.red,
           ),
           body: TabBarView(
+            controller: _tabController,
             children: [
               NotesHome(),
-              Icon(Icons.directions_transit),
+              Container(
+                color: Colors.black,
+              )
             ],
           )),
     );

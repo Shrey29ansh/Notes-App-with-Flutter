@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:chat_app/locker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart';
 // ignore: unused_import
 import 'package:local_auth/local_auth.dart';
 import 'database_helper.dart';
@@ -90,12 +88,12 @@ class _NotesHomeState extends State<NotesHome>
                   Text(
                     "Empty Locker",
                     style: GoogleFonts.roboto(
-                        color: Colors.grey[900], fontSize: 17),
+                        color: Colors.grey[800], fontSize: 17),
                   ),
                   Text(
                     "Create Your first Locker",
                     style: GoogleFonts.roboto(
-                        color: Colors.grey[900], fontSize: 17),
+                        color: Colors.grey[800], fontSize: 17),
                   )
                 ],
               ),
@@ -110,6 +108,7 @@ class _NotesHomeState extends State<NotesHome>
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     GridView.builder(
+                      
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
                         padding: EdgeInsets.all(20),
@@ -170,7 +169,7 @@ class _NotesHomeState extends State<NotesHome>
                                         shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(10)),
-                                        elevation: 2,
+                                        elevation: 1,
                                         shadowColor: checkval
                                             ? colors[index]
                                             : colors[colorindex],

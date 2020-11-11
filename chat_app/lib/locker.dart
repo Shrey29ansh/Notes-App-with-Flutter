@@ -41,11 +41,25 @@ class _LockerState extends State<Locker> {
   bool nextscreen = false;
   bool show = false;
   bool wrong = false, _visible = false;
-
+  final _formKey = GlobalKey<FormState>();
+  final nametext = TextEditingController(),
+      usertext = TextEditingController(),
+      passtext = TextEditingController(),
+      comtext = TextEditingController();
+  FocusNode _myfocus = FocusNode(),
+      namefocus = FocusNode(),
+      passfocus = FocusNode(),
+      comfocus = FocusNode();
   bool _submit = false;
   Future _query() async {
     final allRows = await dbHelper.queryAllRows();
     return allRows;
+  }
+
+  void _requestFocus(FocusNode name) {
+    setState(() {
+      FocusScope.of(context).requestFocus(name);
+    });
   }
 
   Future editnotes() async {}
@@ -216,130 +230,156 @@ class _LockerState extends State<Locker> {
                           ),
                         ],
                       ),
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        child: Card(
-                          elevation: 10,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Container(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Username:",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 17),
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            "$username",
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 17,
+                      Card(
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          width: MediaQuery.of(context).size.width * 0.9,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CardsBox(text: "Username:",),
+                              AnimatedSwitcher(
+                                duration: Duration(milliseconds: 200),
+                                child: _submit
+                                    ? TextFormField(
+                                        // ignore: missing_return
+                                        validator: (value) {
+                                          print(value);
+                                          if (value.isEmpty) {
+                                            return 'required';
+                                          }
+                                        },
+                                        style: TextStyle(color: Colors.black),
+                                        cursorHeight: 20,
+                                        onTap: () {
+                                          _requestFocus(namefocus);
+                                        },
+                                        cursorColor: Colors.black,
+                                        controller: usertext,
+                                        focusNode: namefocus,
+                                        textAlign: TextAlign.center,
+                                        decoration: InputDecoration(
+                                            labelText: "Old:$username",
+                                            enabledBorder:
+                                                new OutlineInputBorder(
+                                              borderRadius:
+                                                  new BorderRadius.circular(
+                                                      10.0),
+                                              borderSide: BorderSide(
+                                                  color: Colors.grey[500]),
                                             ),
-                                            overflow: TextOverflow.clip,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                                            focusedBorder:
+                                                new OutlineInputBorder(
+                                              borderRadius:
+                                                  new BorderRadius.circular(
+                                                      10.0),
+                                              borderSide: BorderSide(
+                                                  color: Colors.blue, width: 2),
+                                            ),
+                                            focusColor: Colors.white,
+                                            errorStyle: TextStyle(),
+                                            hintText: "eg.Main Account",
+                                            hintStyle:
+                                                TextStyle(color: Colors.white)),
+                                      )
+                                    :CardsBox(text: username,)
                               ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        child: Card(
-                          elevation: 10,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Container(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Password:",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 17),
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            "$password",
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 17),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        child: Card(
-                          elevation: 10,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Container(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Comments:",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 17),
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            "$comments",
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 17),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                              CardsBox(text: "Password:",),
+                              _submit
+                                  ? Container(
+                                      padding: EdgeInsets.all(8),
+                                      child: TextFormField(
+                                        // ignore: missing_return
+                                        validator: (value) {
+                                          print(value);
+                                          if (value.isEmpty) {
+                                            return 'required';
+                                          }
+                                        },
+                                        style: TextStyle(color: Colors.black),
+                                        cursorHeight: 20,
+                                        onTap: () {
+                                          _requestFocus(passfocus);
+                                        },
+                                        cursorColor: Colors.black,
+                                        controller: passtext,
+                                        focusNode: passfocus,
+                                        textAlign: TextAlign.center,
+                                        decoration: InputDecoration(
+                                            labelText: "Old:$password",
+                                            enabledBorder:
+                                                new OutlineInputBorder(
+                                              borderRadius:
+                                                  new BorderRadius.circular(
+                                                      10.0),
+                                              borderSide: BorderSide(
+                                                  color: Colors.grey[500]),
+                                            ),
+                                            focusedBorder:
+                                                new OutlineInputBorder(
+                                              borderRadius:
+                                                  new BorderRadius.circular(
+                                                      10.0),
+                                              borderSide: BorderSide(
+                                                  color: Colors.blue, width: 2),
+                                            ),
+                                            focusColor: Colors.white,
+                                            errorStyle: TextStyle(),
+                                            hintText: "eg.Main Account",
+                                            hintStyle:
+                                                TextStyle(color: Colors.white)),
+                                      ),
+                                    )
+                                  : CardsBox(text: password,),
+                              CardsBox(text: "Comments",),
+                              _submit
+                                  ? Container(
+                                      padding: EdgeInsets.all(8),
+                                      child: TextFormField(
+                                        // ignore: missing_return
+                                        validator: (value) {
+                                          print(value);
+                                          if (value.isEmpty) {
+                                            return 'required';
+                                          }
+                                        },
+                                        style: TextStyle(color: Colors.black),
+                                        cursorHeight: 20,
+                                        onTap: () {
+                                          _requestFocus(comfocus);
+                                        },
+                                        cursorColor: Colors.black,
+                                        controller: comtext,
+                                        focusNode: comfocus,
+                                        textAlign: TextAlign.center,
+                                        decoration: InputDecoration(
+                                            labelText: "Old:$comments",
+                                            enabledBorder:
+                                                new OutlineInputBorder(
+                                              borderRadius:
+                                                  new BorderRadius.circular(
+                                                      10.0),
+                                              borderSide: BorderSide(
+                                                  color: Colors.grey[500]),
+                                            ),
+                                            focusedBorder:
+                                                new OutlineInputBorder(
+                                              borderRadius:
+                                                  new BorderRadius.circular(
+                                                      10.0),
+                                              borderSide: BorderSide(
+                                                  color: Colors.blue, width: 2),
+                                            ),
+                                            focusColor: Colors.white,
+                                            errorStyle: TextStyle(),
+                                            hintText: "eg.Main Account",
+                                            hintStyle:
+                                                TextStyle(color: Colors.white)),
+                                      ),
+                                    )
+                                  : CardsBox(text: comments,)
+                            ],
                           ),
                         ),
                       ),
@@ -527,6 +567,18 @@ class _LockerState extends State<Locker> {
                   )
                 : Container(child: Center(child: CircularProgressIndicator())),
       ),
+    );
+  }
+}
+
+class CardsBox extends StatelessWidget {
+  final text;
+  CardsBox({this.text});
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      "$text",
+      style: TextStyle(color: Colors.black, fontSize: 17),
     );
   }
 }
