@@ -158,6 +158,7 @@ class _NotesHomeState extends State<NotesHome>
                                               password: snapshot.data[index]
                                                   ['password'],
                                               comments: snapshot.data[index]
+                                                  ['comments'].isEmpty ? "Empty" : snapshot.data[index]
                                                   ['comments'],
                                               color: checkval
                                                   ? colors[index]
