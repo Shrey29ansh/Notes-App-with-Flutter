@@ -41,21 +41,26 @@ class _LockerState extends State<Locker> {
   bool nextscreen = false;
   bool show = false;
   bool wrong = false, _visible = false;
+  // ignore: unused_field
   final _formKey = GlobalKey<FormState>();
   final nametext = TextEditingController(),
       usertext = TextEditingController(),
       passtext = TextEditingController(),
       comtext = TextEditingController();
+  // ignore: unused_field
+  bool _submit = false;
+  // ignore: unused_field
   FocusNode _myfocus = FocusNode(),
       namefocus = FocusNode(),
       passfocus = FocusNode(),
       comfocus = FocusNode();
-  bool _submit = false;
+  
   Future _query() async {
     final allRows = await dbHelper.queryAllRows();
     return allRows;
   }
 
+  // ignore: unused_element
   void _requestFocus(FocusNode name) {
     setState(() {
       FocusScope.of(context).requestFocus(name);
@@ -195,7 +200,235 @@ class _LockerState extends State<Locker> {
         child: show
             ? Stack(
                 children: [
-                  /*
+                  Positioned(
+                      top: -50,
+                      right: 0,
+                      child: ClipRRect(
+                        child: Icon(
+                          Icons.vpn_key,
+                          size: 500,
+                          color: Colors.amber,
+                        ),
+                      )),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      height: MediaQuery.of(context).size.height,
+                      width: MediaQuery.of(context).size.width,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.fromLTRB(0, 0, 0, 50),
+                            width: MediaQuery.of(context).size.width * 0.3,
+                            height: MediaQuery.of(context).size.width * 0.3,
+                            decoration: BoxDecoration(
+                                color: Colors.grey[900],
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Center(
+                              child: Text(
+                                username[0],
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 80,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ),
+                          ),
+                          Align(
+                            child: Container(
+                              height: MediaQuery.of(context).size.height * 0.7,
+                              width: MediaQuery.of(context).size.width * 0.9,
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.rectangle,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(10),
+                                    topRight: Radius.circular(10),
+                                  )),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  AnimatedPositioned(
+                    duration: Duration(milliseconds: 500),
+                    bottom: _bottom,
+                    right: MediaQuery.of(context).size.width * 0.37,
+                    curve: Curves.easeOutQuart,
+                    child: Container(
+                      margin: EdgeInsets.all(10),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  primary: Colors.black.withOpacity(0.5),
+                                   elevation: 10,
+                                    shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ), 
+                              child: Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (_) {
+                                      return Container(
+                                        child: DeleteAlert(
+                                          lockername: lockername,
+                                        ),
+                                      );
+                                    });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              )
+            : showcont
+                ? Align(
+                    alignment: Alignment.center,
+                    child: AnimatedOpacity(
+                      duration: Duration(milliseconds: 500),
+                      opacity: _visible ? 1 : 0,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        height: MediaQuery.of(context).size.height * 0.4,
+                        child: Card(
+                          elevation: 10,
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Text(
+                                        "Enter Pin",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.7,
+                                child: Directionality(
+                                  textDirection: TextDirection.ltr,
+                                  child: TextField(
+                                    onTap: () {
+                                      setState(() {});
+                                    },
+                                    obscureText: true,
+                                    cursorColor: Colors.black,
+                                    controller: number,
+                                    autocorrect: true,
+                                    textAlign: TextAlign.center,
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      focusColor: Colors.blue,
+                                      errorText: warn,
+                                      errorStyle: TextStyle(),
+                                      hintText: "Enter PIN",
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                        borderSide: BorderSide(
+                                          color: Colors.amber,
+                                          style: BorderStyle.solid,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.blue,
+                                   elevation: 5,
+                                    shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ),                           
+                                  child: Text(
+                                    'Submit',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  
+                                  onPressed: () async {
+                                    print(number.text);
+                                    if (number.text.isEmpty) {
+                                      setState(() {
+                                        warn = "Pin is required";
+                                      });
+                                    } else {
+                                      await _checkpin();
+                                      if (exactval == number.text) {
+                                        setState(() {
+                                          show = true;
+                                        });
+                                      } else {
+                                        setState(() {
+                                          warn = 'Try Again!';
+                                          wrong = true;
+                                        });
+                                      }
+                                    }
+
+                                    number.clear();
+                                  }),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : Container(child: Center(child: CircularProgressIndicator())),
+      ),
+    );
+  }
+}
+
+class CardsBox extends StatelessWidget {
+  final text;
+  final bool richtext;
+  CardsBox({this.text, this.richtext});
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      "$text",
+      style: TextStyle(
+          color: richtext ? Colors.black : Colors.grey[800],
+          fontWeight: /* richtext ?  */ FontWeight
+              .bold /* : FontWeight.normal */,
+          fontSize: 18),
+    );
+  }
+}
+
+/*
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -418,7 +651,7 @@ class _LockerState extends State<Locker> {
                           curve: Curves.decelerate,
                           duration: Duration(milliseconds: 500),
                           child: Container(
-                            child: RaisedButton(
+                            child: ElevatedButton(
                                 elevation: 10,
                                 splashColor: Colors.deepOrange,
                                 color: Colors.green,
@@ -437,95 +670,10 @@ class _LockerState extends State<Locker> {
                       )
                     ],
                   ), */
-
-                  Positioned(
-                      top: -50,
-                      right: 0,
-                      child: ClipRRect(
-                        child: Icon(
-                          Icons.vpn_key,
-                          size: 500,
-                          color: Colors.amber,
-                        ),
-                      )),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Container(
-                      height: MediaQuery.of(context).size.height,
-                      width: MediaQuery.of(context).size.width,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Container(
-                            margin: EdgeInsets.fromLTRB(0, 0, 0, 50),
-                            width: MediaQuery.of(context).size.width * 0.3,
-                            height: MediaQuery.of(context).size.width * 0.3,
-                            decoration: BoxDecoration(
-                                color: Colors.grey[900],
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.circular(10)),
-                            child: Center(
-                              child: Text(
-                                username[0],
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 80,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                            ),
-                          ),
-                          Align(
-                            child: Container(
-                              height: MediaQuery.of(context).size.height * 0.7,
-                              width: MediaQuery.of(context).size.width * 0.9,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(10),
-                                    topRight: Radius.circular(10),
-                                  )),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  AnimatedPositioned(
-                    duration: Duration(milliseconds: 500),
-                    bottom: _bottom,
-                    right: MediaQuery.of(context).size.width * 0.37,
-                    curve: Curves.easeOutQuart,
-                    child: Container(
-                      margin: EdgeInsets.all(10),
-                      child: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            RaisedButton(
-                              elevation: 10,
-                              color: Colors.black.withOpacity(0.5),
-                              child: Icon(
-                                Icons.delete,
-                                color: Colors.white,
-                              ),
-                              onPressed: () {
-                                showDialog(
-                                    context: context,
-                                    builder: (_) {
-                                      return Container(
-                                        child: DeleteAlert(
-                                          lockername: lockername,
-                                        ),
-                                      );
-                                    });
-                              },
-                            ),
-                            /* SizedBox(
+/* SizedBox(
                               width: 5,
                             ),
-                            RaisedButton(
+                            ElevatedButton(
                               elevation: 10,
                               color: Colors.black.withOpacity(0.5),
                               child: Icon(
@@ -539,137 +687,3 @@ class _LockerState extends State<Locker> {
                                 });
                               },
                             ), */
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              )
-            : showcont
-                ? Align(
-                    alignment: Alignment.center,
-                    child: AnimatedOpacity(
-                      duration: Duration(milliseconds: 500),
-                      opacity: _visible ? 1 : 0,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * 0.8,
-                        height: MediaQuery.of(context).size.height * 0.4,
-                        child: Card(
-                          elevation: 10,
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Column(
-                                    children: [
-                                      Text(
-                                        "Enter Pin",
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                width: MediaQuery.of(context).size.width * 0.7,
-                                child: Directionality(
-                                  textDirection: TextDirection.ltr,
-                                  child: TextField(
-                                    onTap: () {
-                                      setState(() {});
-                                    },
-                                    obscureText: true,
-                                    cursorColor: Colors.black,
-                                    controller: number,
-                                    autocorrect: true,
-                                    textAlign: TextAlign.center,
-                                    keyboardType: TextInputType.number,
-                                    decoration: InputDecoration(
-                                      focusColor: Colors.blue,
-                                      errorText: warn,
-                                      errorStyle: TextStyle(),
-                                      hintText: "Enter PIN",
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                        borderSide: BorderSide(
-                                          color: Colors.amber,
-                                          style: BorderStyle.solid,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              RaisedButton(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  elevation: 5,
-                                  child: Text(
-                                    'Submit',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  color: Colors.blue,
-                                  onPressed: () async {
-                                    print(number.text);
-                                    if (number.text.isEmpty) {
-                                      setState(() {
-                                        warn = "Pin is required";
-                                      });
-                                    } else {
-                                      await _checkpin();
-                                      if (exactval == number.text) {
-                                        setState(() {
-                                          show = true;
-                                        });
-                                      } else {
-                                        setState(() {
-                                          warn = 'Try Again!';
-                                          wrong = true;
-                                        });
-                                      }
-                                    }
-
-                                    number.clear();
-                                  }),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                : Container(child: Center(child: CircularProgressIndicator())),
-      ),
-    );
-  }
-}
-
-class CardsBox extends StatelessWidget {
-  final text;
-  final bool richtext;
-  CardsBox({this.text, this.richtext});
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      "$text",
-      style: TextStyle(
-          color: richtext ? Colors.black : Colors.grey[800],
-          fontWeight: /* richtext ?  */ FontWeight
-              .bold /* : FontWeight.normal */,
-          fontSize: 18),
-    );
-  }
-}

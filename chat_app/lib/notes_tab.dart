@@ -108,7 +108,6 @@ class _NotesHomeState extends State<NotesHome>
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     GridView.builder(
-                      
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
                         padding: EdgeInsets.all(20),
@@ -157,9 +156,12 @@ class _NotesHomeState extends State<NotesHome>
                                                   ['username'],
                                               password: snapshot.data[index]
                                                   ['password'],
-                                              comments: snapshot.data[index]
-                                                  ['comments'].isEmpty ? "Empty" : snapshot.data[index]
-                                                  ['comments'],
+                                              comments: snapshot
+                                                      .data[index]['comments']
+                                                      .isEmpty
+                                                  ? "Empty"
+                                                  : snapshot.data[index]
+                                                      ['comments'],
                                               color: checkval
                                                   ? colors[index]
                                                   : colors[colorindex],
@@ -344,18 +346,20 @@ class _AlertBoxState extends State<AlertBox> {
                   buttonPadding: EdgeInsets.all(10),
                   contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 0),
                   actions: [
-                    RaisedButton(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      elevation: 5,
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                                  primary: Colors.grey[900],
+                                   elevation: 10,
+                                    shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ), 
                       child: Text(
                         'Create',
                         style: TextStyle(
                           color: Colors.white,
                         ),
                       ),
-                      color: Colors.grey[900],
                       onPressed: () async {
                         if (_myfocus.hasFocus) {
                           var check = await checklocker(nametext.text);
@@ -397,18 +401,20 @@ class _AlertBoxState extends State<AlertBox> {
                         }
                       },
                     ),
-                    RaisedButton(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      elevation: 5,
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                                  primary:Colors.grey[900],
+                                   elevation: 10,
+                                    shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ), 
                       child: Text(
                         'Cancel',
                         style: TextStyle(
                           color: Colors.white,
                         ),
                       ),
-                      color: Colors.grey[900],
                       onPressed: () {
                         /* print(nametext.text);
                         print(password.text);
@@ -680,34 +686,38 @@ class _DeleteAlertState extends State<DeleteAlert> {
               ),
               actionsPadding: EdgeInsets.all(10),
               actions: [
-                RaisedButton(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  elevation: 5,
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                                  primary:Colors.grey[900],
+                                   elevation: 10,
+                                    shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ),
                   child: Text(
                     'Yes',
                     style: TextStyle(
                       color: Colors.white,
                     ),
                   ),
-                  color: Colors.grey[900],
                   onPressed: () async {
                     await deleteLocker();
                   },
                 ),
-                RaisedButton(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  elevation: 5,
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                                  primary: Colors.grey[900],
+                                   elevation: 10,
+                                    shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ), 
                   child: Text(
                     'Cancel',
                     style: TextStyle(
                       color: Colors.white,
                     ),
                   ),
-                  color: Colors.grey[900],
                   onPressed: () {
                     Navigator.of(context).pop();
                   },

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-
 class EditAlert extends StatefulWidget {
   final lockername;
   EditAlert({this.lockername});
@@ -13,9 +12,7 @@ class _EditAlertState extends State<EditAlert> {
   final lockername;
   _EditAlertState({this.lockername});
   double _showalert = 0;
-  Future editnotes() async{
-    
-  } 
+  Future editnotes() async {}
   startTImer() {
     var duration = Duration(microseconds: 100);
     return new Timer(duration, () {
@@ -51,32 +48,38 @@ class _EditAlertState extends State<EditAlert> {
               ),
               actionsPadding: EdgeInsets.all(10),
               actions: [
-                RaisedButton(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  elevation: 5,
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                                  primary:  Colors.grey[900],
+                                   elevation: 5,
+                                    shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ),  
+                
                   child: Text(
                     'Yes',
                     style: TextStyle(
                       color: Colors.white,
                     ),
                   ),
-                  color: Colors.grey[900],
                   onPressed: () {},
                 ),
-                RaisedButton(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  elevation: 5,
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                                  primary: Colors.grey[900],
+                                   elevation: 5,
+                                    shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ),  
                   child: Text(
                     'Cancel',
                     style: TextStyle(
                       color: Colors.white,
                     ),
                   ),
-                  color: Colors.grey[900],
+                
                   onPressed: () {
                     Navigator.of(context).pop();
                   },

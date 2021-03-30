@@ -54,7 +54,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   // ignore: non_constant_identifier_names
   double width_container = 0, bottomheight = 90;
-  var xf = 1, temp = -0.4, result, exactval, warn = null;
+  var xf = 1, temp = -0.4, result, exactval, warn;
 
   bool _visible = false,
       nobiometric = false,
@@ -276,18 +276,20 @@ class _SplashScreenState extends State<SplashScreen> {
                                     ),
                                   ),
                                 ),
-                                RaisedButton(
-                                  shape: RoundedRectangleBorder(
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                  primary:Colors.blue,
+                                   elevation: 10,
+                                    shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(5),
                                   ),
-                                  elevation: 5,
+                                ), 
                                   child: Text(
                                     'Submit',
                                     style: TextStyle(
                                       color: Colors.white,
                                     ),
                                   ),
-                                  color: Colors.blue,
                                   onPressed: () {
                                     print(number.text);
                                     if (number.text.isEmpty) {
